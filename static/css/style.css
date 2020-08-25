@@ -113,6 +113,10 @@ body {
 	padding: 1em;
 }
 
+.page_list {
+	text-align: center;
+}
+
 /* --- POSTS --- */
 
 #posts {
