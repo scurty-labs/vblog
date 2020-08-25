@@ -1,0 +1,30 @@
+@header
+
+@if app.is_admin
+
+	<div class="pure-g">
+
+	<div class="pure-u-1">
+	<div class="page_header"><h2>Edit Post</h2></div>
+	</div>
+	
+	<div class="pure-u-1 pure-u-md-1-4"></div>
+	<div class="page_content pure-u-1 pure-u-md-1-2">
+		@if invalid
+		<p>Fields cannot be empty.</p>
+		@end
+		<form class="pure-form" method="post" action="/save/post/@post.id">
+			<input class="pure-input-rounded" style="width: 100%;" type="text" name="post_title" value="@post.title"><br/><br/>
+			<textarea style="width: 100%; max-width: 100%; min-width: 100%;" name="post_body">@post.body</textarea><br/>
+			<br/>
+			<button class="button-success pure-button" type="submit" >Save</button>
+		</form>
+	
+	</div>
+	<div class="pure-u-1 pure-u-md-1-4"></div>
+</div>
+
+@end
+
+</body>
+</html>
