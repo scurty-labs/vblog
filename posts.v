@@ -18,6 +18,11 @@ pub fn (mut app App) get_all_posts() []Post {
 	return posts
 }
 
+pub fn (mut app App) get_posts_count() int {
+	num := sql app.db { select count from Post where deleted == 0  }
+	return num
+}
+
 pub fn (post Post) format_date() string {
 	t := time.unix(post.date)
 	return t.format()
@@ -26,6 +31,12 @@ pub fn (post Post) format_date() string {
 pub fn (mut app App) get_post_by_id(post_id int) Post {
 	post := sql app.db { select from Post where id == post_id limit 1 }
 	return post
+}
+
+pub fn (mut app App) get_posts_page(page_num int, num_per int) []Post {
+	offs := page_num * num_per
+	posts := sql app.db { select from Post where deleted == 0 order by date desc limit num_per offset offs }
+	return posts
 }
 
 pub fn (mut app App) update_post(post_id int, t string, b string) {

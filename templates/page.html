@@ -28,6 +28,9 @@
 <!-- Posts -->
 <div id="posts">
 
+@if !invalid
+
+<p>Page: @page_num of @max_pages</p>
 @for post in blog_posts
 <div class="blog_post">
 	
@@ -47,33 +50,31 @@
 </div>
 @end
 
-<!--
-<div class="pure-menu pure-menu-horizontal">
-    <ul class="pure-menu-list">
-        <li class="pure-menu-item pure-menu-selected">
-            <a href="#" class="pure-menu-link">Selected</a>
-        </li>
-        <li class="pure-menu-item">
-            <a href="#" class="pure-menu-link">Normal</a>
-        </li>
-        <li class="pure-menu-item pure-menu-disabled">Disabled</li>
-    </ul>
-</div>
-
--->
-
+<!-- PAGINATION -->
 @if max_pages>0
 
 <div class="pure-menu pure-menu-horizontal">
 <p>- Pages -</p>
-<ul class="pure-menu-list">
+<ul class="page_list pure-menu-list">
 @for page := 0; page <= max_pages; page++
+	@if page != page_num
 	<li class="pure-menu-item">
 		<a href="/page/@page" class="pure-menu-link">@page</a>
 	</li>
+	@else
+	<li class="pure-menu-item pure-menu-selected">
+		<a href="/page/@page" class="pure-menu-link">@page</a>
+	</li>
+	@end
 @end
 </ul>
 </div>
+
+@end
+
+@else
+
+<p>This page number doesn't exist.</p>
 
 @end
 
