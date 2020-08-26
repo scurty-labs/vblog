@@ -6,7 +6,7 @@
 
 <div style="padding: 0.25em; background: @app.settings.accent_foreground;"></div>
 <h1 class="blog_title">@app.settings.blog_title</h1>
-<p class="blog_desc">@app.settings.blog_description</p>
+<p class="blog_desc">@{ app.as_html(app.settings.blog_description) }</p>
 
 <form class="search pure-form" method="post" action="/searchresults">
 	<input class="search_box pure-input-rounded" style="width: 100%;" type="text" name="search" placeholder="Search..."><br/><br/>
@@ -44,7 +44,7 @@
 	
 	</div>
 	
-	<div class="post_content">@post.body</div>
+	<div class="post_content">@{ app.as_html(post.body) }</div>
 	<div class="post_footer"></div>
 	
 </div>
