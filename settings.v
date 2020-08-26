@@ -18,6 +18,7 @@ pub mut:
 	posts_per_page string
 }
 
+// -- TODO: Change! Use maps instead. --
 pub fn (mut app App) load_settings() {
 	data := sql app.db { select from Setting }
 	app.settings.blog_title = setting_get(data, 'blog_title')

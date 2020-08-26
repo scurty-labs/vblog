@@ -5,7 +5,7 @@
 <div class="sidebar_content">
 
 <div style="padding: 0.25em; background: @app.settings.accent_foreground;"></div>
-<h1 class="blog_title">@app.settings.blog_title</h1>
+<h1 class="blog_title"><a href="/">@app.settings.blog_title</a></h1>
 <p class="blog_desc">@{ app.as_html(app.settings.blog_description) }</p>
 
 <form class="search pure-form" method="post" action="/searchresults">
@@ -20,7 +20,7 @@
 @if app.is_admin
 <div id="admin_controls">
 <a class="button-success pure-button" href="/newpost">New Post</a>
-<a class="pure-button" href="/settings">Settings</a>
+<a class="pure-button" href="/settings">Admin</a>
 <a class="button-error pure-button" href="/logout">Logout</a>
 </div>
 @end
