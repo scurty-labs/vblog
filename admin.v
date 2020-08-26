@@ -3,7 +3,7 @@ module main
 import vweb
 import crypto.md5
 
-// -- CHANGE THESE VALUES AS NEEDED -- //
+// -- TODO: CHANGE THESE VALUES AS NEEDED -- //
 const (
 	salt = '9348v&**veds02591684ferb8g45))'
 	admin_username = 'admin'

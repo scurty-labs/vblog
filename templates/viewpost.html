@@ -5,7 +5,7 @@
 <div class="sidebar_content">
 
 <div style="padding: 0.25em; background: @app.settings.accent_foreground;"></div>
-<h1 class="blog_title">@app.settings.blog_title</h1>
+<h1 class="blog_title"><a href="/">@app.settings.blog_title</a></h1>
 <p class="blog_desc">@app.settings.blog_description</p>
 
 <form class="search pure-form" method="post" action="/searchresults">
@@ -20,32 +20,27 @@
 @if app.is_admin
 <div id="admin_controls">
 <a class="button-success pure-button" href="/newpost">New Post</a>
-<a class="pure-button" href="/settings">Settings</a>
+<a class="pure-button" href="/settings">Admin</a>
 <a class="button-error pure-button" href="/logout">Logout</a>
 </div>
 @end
 
 <!-- Posts -->
-<div id="posts">
+<div class="view_post_header">
 
-<div class="blog_post">
-	
-	<div class="post_header">
-	
-	<h2 class="post_title" style="border-bottom: 1px; border-color: #222222;">@post.title</h2>
-	<div class="post_meta"><i>@post.format_date()</i></div>
-	@if app.is_admin
-	<span class="post_actions"><a href="/delete/post/@post.id" style="color: rgb(202, 60, 60);">Delete</a> | <a href="/edit/post/@post.id">Edit</a></span>
-	@end
-	
-	</div>
-	
-	<div class="post_content">@post.body</div>
+<h2 class="post_title">@post.title</h2>
+<div class="post_meta"><i>@post.format_date()</i></div>
+@if app.is_admin
+<span class="post_actions"><a href="/delete/post/@post.id" style="color: rgb(202, 60, 60);">Delete</a> | <a href="/edit/post/@post.id">Edit</a></span>
+@end
+
+</div>
+
+<div class="view_post_content">
+	<div class="post_content">@{ app.as_html(post.body) }</div>
 	<div class="post_footer"></div>
-	
 </div>
 
-</div>
 
 </div>
 
