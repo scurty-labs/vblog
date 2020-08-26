@@ -15,6 +15,7 @@ pub mut:
 	blog_description string
 	accent_foreground string
 	custom_css string
+	posts_per_page string
 }
 
 pub fn (mut app App) load_settings() {
@@ -23,6 +24,7 @@ pub fn (mut app App) load_settings() {
 	app.settings.blog_description = setting_get(data, 'blog_description')
 	app.settings.accent_foreground = setting_get(data, 'accent_foreground')
 	app.settings.custom_css = setting_get(data, 'custom_css')
+	app.settings.posts_per_page = setting_get(data, 'posts_per_page')
 }
 
 fn setting_get(arr &[]Setting, key string) string {
@@ -45,6 +47,8 @@ pub fn (mut app App) commit_settings()  {
 	custom_css := app.settings.custom_css
 	sql app.db { update Setting set value = custom_css where key == 'custom_css' }
 	
+	posts_per_page := app.settings.posts_per_page
+	sql app.db { update Setting set value = posts_per_page where key == 'posts_per_page' }
 }
 
 [post]
@@ -56,6 +60,7 @@ pub fn (mut app App) save_settings() vweb.Result {
 	app.settings.blog_description = app.vweb.form['blog_description']
 	app.settings.accent_foreground = app.vweb.form['accent_foreground']
 	app.settings.custom_css = app.vweb.form['custom_css']
+	app.settings.posts_per_page = app.vweb.form['posts_per_page']
 	app.commit_settings()
 	
 	return app.r_home()

@@ -13,6 +13,8 @@
 		<form class="pure-form" method="post" action="save/settings">
 			<input style="width: 100%;" type="text" name="blog_title" value="@app.settings.blog_title"><br/><br/>
 			<textarea style="width: 100%;" name="blog_description">@app.settings.blog_description</textarea><br/><br/>
+			<p>Posts Per Page</p>
+			<input type="number" name="posts_per_page" min="1" max="100" value="@app.settings.posts_per_page">
 			<p>Accent Color</p>
 			<input type="text" name="accent_foreground" value="@app.settings.accent_foreground"><br/><br/>
 			<p>Custom CSS</p>

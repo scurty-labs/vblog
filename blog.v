@@ -1,5 +1,6 @@
 module main
 
+import strconv
 import vweb
 import sqlite
 import markdown
@@ -17,7 +18,6 @@ pub mut:
 	invalid_newpost bool
 	is_admin bool
 	search_res_nr int
-	posts_per_page int
 }
 
 fn main() {
@@ -39,17 +39,21 @@ pub fn (mut app App) init_once() {
 	app.load_settings()
 	
 	// Initialize Defaults
-	app.posts_per_page = 5
 	app.invalid_userpass = false
 	app.invalid_newpost = false
 }
 
-pub fn (mut app App) init() {}
+pub fn (mut app App) init() {
+
+	// Refresh Settings
+	app.load_settings()
+
+}
 
 pub fn (mut app App) index() vweb.Result {
 	//blog_posts := app.get_all_posts()
-	blog_posts := app.get_posts_page(0, app.posts_per_page)
-	max_pages := (app.get_posts_count() / app.posts_per_page)
+	blog_posts := app.get_posts_page(0, strconv.atoi(app.settings.posts_per_page))
+	max_pages := (app.get_posts_count() / strconv.atoi(app.settings.posts_per_page))
 	app.is_admin = app.auth()
 	return $vweb.html()
 }
@@ -60,11 +64,11 @@ pub fn (mut app App) as_html(str string) vweb.RawHtml {
 
 ['/page/:page_num']
 pub fn (mut app App) page(page_num int) vweb.Result {
-	max_pages := (app.get_posts_count() / app.posts_per_page)
+	max_pages := (app.get_posts_count() / strconv.atoi(app.settings.posts_per_page))
 	mut blog_posts := []Post{}
 	mut invalid := false
 	if page_num <= max_pages {
-		blog_posts = app.get_posts_page(page_num, app.posts_per_page)
+		blog_posts = app.get_posts_page(page_num, strconv.atoi(app.settings.posts_per_page))
 	}else{
 		invalid = true
 	}

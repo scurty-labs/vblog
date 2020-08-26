@@ -27,6 +27,7 @@ pub fn (mut app App) logout() vweb.Result {
 
 pub fn (mut app App) settings() vweb.Result {
 	if !app.auth() { return app.r_home() }
+	app.load_settings()
 	return $vweb.html()
 }
 
