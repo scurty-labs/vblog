@@ -2,6 +2,7 @@ module main
 
 import vweb
 import sqlite
+import markdown
 
 const (
 	port = 8082
@@ -51,6 +52,10 @@ pub fn (mut app App) index() vweb.Result {
 	max_pages := (app.get_posts_count() / app.posts_per_page)
 	app.is_admin = app.auth()
 	return $vweb.html()
+}
+
+pub fn (mut app App) as_html(str string) vweb.RawHtml {
+	return vweb.RawHtml(markdown.to_html(str))
 }
 
 ['/page/:page_num']

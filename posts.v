@@ -96,7 +96,7 @@ pub fn (mut app App) create_new_post() vweb.Result {
 	body := app.vweb.form['post_body']
 	app.invalid_newpost = false
 	
-	if title != '' && body != '' {
+	if title.len > 0 && body.len > 0 { // Seems to not like large data in `body`
 		t := time.now()
 		app.insert_new_post(Post{title:title, body:body, date:t.unix_time()})
 		return app.r_home()
@@ -129,15 +129,14 @@ pub fn (mut app App) searchresults() vweb.Result {
 	query := app.vweb.form['search']
 	mut rel_post := []Post{}
 	
-	if query.len > 2 {
-	
+	if query.len >= 1 {
 		for post in app.get_all_posts() {
 			if post.title.contains(query) || post.body.contains(query) {
 				rel_post << post
 			}
 		}
-	
 	}
+	
 	return $vweb.html()
 }
 
