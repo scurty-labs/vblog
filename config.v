@@ -3,7 +3,6 @@ module main
 import os
 import rand
 import time
-import crypto.md5
 import json
 
 const (
@@ -44,8 +43,9 @@ fn load_config() Config {
 
 fn (config Config) save() {
 	data := json.encode(config)
-	os.write_file(data, 'config.json') or {
-		println('error saving config.json')
+	println(data)
+	os.write_file('config.json', data) or {
+		eprintln('Error saving configuration.')
 	}
 }
 
@@ -68,7 +68,7 @@ fn generate_config() {
 			client_secret: secret
 			admin_username: username
 			admin_email: email
-			admin_password: md5.sum('$salt$secret$username$email$pass1$email'.bytes()).hex()
+			admin_password: pass1
 		}
 		conf.save()
 		println('Finished.')
