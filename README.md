@@ -1,12 +1,9 @@
 # vblog
 
 A simple and fast personal(single user for now) blogging system written in V using VWeb.
-Simply run `v .` for testing.
+After building with `v .` or `v -prod`, run `./blog` to setup your configuration file. Then run `./blog` again to start the server.
 
-Go to `localhost:8082/admin`
-Username: `admin`
-Password: `asdf`
-(Changable in `admin.v` for now.)
+Go to `localhost:8082/admin` for login prompt.
 
 ## Features
 - Create/Edit/Delete Posts
