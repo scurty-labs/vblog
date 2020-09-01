@@ -13,6 +13,7 @@ struct App {
 pub mut:
 	vweb vweb.Context
 	db sqlite.DB
+	config Config
 	settings Settings
 	invalid_userpass bool
 	invalid_newpost bool
@@ -25,6 +26,12 @@ fn main() {
 }
 
 pub fn (mut app App) init_once() {
+	app.config = load_config()
+	if app.config.client_salt.len == 0 {
+		println('cannot load config.json, aborting. be sure to run ./blog init first')
+		return
+	}
+	
 	app.vweb.handle_static('.')
 	
 	app.vweb.serve_static('/pure-min.css', 'static/css/pure-min.css', 'text/css')
