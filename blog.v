@@ -26,10 +26,12 @@ fn main() {
 }
 
 pub fn (mut app App) init_once() {
+
 	app.config = load_config()
-	if app.config.client_salt.len == 0 {
-		println('cannot load config.json, aborting. be sure to run ./blog init first')
-		return
+	if app.config.client_secret.len == 0 {
+		println('Cannot find configuration file. Entering setup...')
+		generate_config()
+		exit(1)
 	}
 	
 	app.vweb.handle_static('.')
