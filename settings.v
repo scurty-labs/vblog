@@ -28,7 +28,7 @@ pub fn (mut app App) load_settings() {
 	app.settings.posts_per_page = setting_get(data, 'posts_per_page')
 }
 
-fn setting_get(arr &[]Setting, key string) string {
+fn setting_get(arr []Setting, key string) string {
 	for i in arr {
 		if i.key == key { return i.value }
 	}
