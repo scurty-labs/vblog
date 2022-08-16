@@ -1,1 +1,1 @@
-killall blog
+killall vblog
