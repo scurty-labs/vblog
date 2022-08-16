@@ -1,4 +1,4 @@
-@header
+@include 'header'
 
 <!-- Sidebar -->
 <div class="sidebar pure-u-1 pure-u-md-1-4">
@@ -28,7 +28,7 @@
 <!-- Posts -->
 <div class="view_post_header">
 
-<h2 class="post_title">@post.title</h2>
+<h2 class="post_title" style="color: @app.settings.accent_foreground;">@post.title</h2>
 <div class="post_meta"><i>@post.format_date()</i></div>
 @if app.is_admin
 <span class="post_actions"><a href="/delete/post/@post.id" style="color: rgb(202, 60, 60);">Delete</a> | <a href="/edit/post/@post.id">Edit</a></span>
@@ -46,4 +46,4 @@
 
 </div>
 
-@footer
+@include 'footer'

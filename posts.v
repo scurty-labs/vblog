@@ -6,11 +6,11 @@ import time
 struct Post {
 pub mut:
 
-	id int
+	id int [primary; sql: serial]
 	title string
 	body string
 	deleted int
-	date int
+	date i64
 }
 
 pub fn (mut app App) get_all_posts() []Post {
@@ -44,6 +44,7 @@ pub fn (mut app App) update_post(post_id int, t string, b string) {
 }
 
 pub fn (mut app App) insert_new_post(post Post) {
+	//println(post)
 	sql app.db { insert post into Post }
 }
 
@@ -72,8 +73,8 @@ pub fn (mut app App) edit(post_id int) vweb.Result {
 pub fn (mut app App) save_post(post_id int) vweb.Result {
 	if !app.auth() { return app.r_home() }
 
-	title := app.vweb.form['post_title']
-	body := app.vweb.form['post_body']
+	title := app.form['post_title']
+	body := app.form['post_body']
 	app.invalid_newpost = false
 	
 	if title != '' && body != '' {
@@ -82,7 +83,7 @@ pub fn (mut app App) save_post(post_id int) vweb.Result {
 		return app.r_home()
 	}else{
 		app.invalid_newpost = true
-		return app.vweb.redirect('/edit/post/$post_id/')
+		return app.redirect('/edit/post/$post_id/')
 	}
 	return app.r_home()
 }
@@ -92,22 +93,23 @@ pub fn (mut app App) save_post(post_id int) vweb.Result {
 pub fn (mut app App) create_new_post() vweb.Result {
 	if !app.auth() { return app.r_home() }
 	
-	title := app.vweb.form['post_title']
-	body := app.vweb.form['post_body']
+	title := app.form['post_title']
+	body := app.form['post_body']
 	app.invalid_newpost = false
 	
 	if title.len > 0 && body.len > 0 { // Seems to not like large data in `body`
 		t := time.now()
-		app.insert_new_post(Post{title:title, body:body, date:t.unix_time()})
+		app.insert_new_post(Post{title:title, body:body, date:t.unix_time() })
 		return app.r_home()
 	}else{
 		app.invalid_newpost = true
-		return app.vweb.redirect('/newpost')
+		return app.redirect('/newpost')
 	}
 }
 
 ['/view/post/:post_id']
 pub fn (mut app App) viewpost(post_id int) vweb.Result {
+	app.settings = app.load_settings()
 	post := app.get_post_by_id(post_id)
 	if post.title == '' {
 		return app.r_home()
@@ -126,7 +128,7 @@ pub fn (mut app App) delete_post_handle(post_id int) vweb.Result {
 [post]
 ['/searchresults']
 pub fn (mut app App) searchresults() vweb.Result {
-	query := app.vweb.form['search']
+	query := app.form['search']
 	mut rel_post := []Post{}
 	
 	if query.len >= 1 {

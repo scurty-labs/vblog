@@ -1,4 +1,4 @@
-@header
+@include 'header'
 
 @if app.is_admin
 
@@ -14,7 +14,7 @@
 		<p>Fields cannot be empty.</p>
 		@end
 		<form class="pure-form" method="post" action="/new/post">
-			<input class="pure-input-rounded" style="width: 100%;" type="text" name="post_title" placeholder="Enter Post Title..."><br/><br/>
+			<input class="pure-input-rounded" style="width: 100%;" type="text" name="post_title" value=""><br/><br/>
 			<textarea style="width: 100%; max-width: 100%; min-width: 100%;" name="post_body"></textarea><br/>
 			<br/>
 			<button class="button-success pure-button" type="submit" >Post</button>
@@ -22,8 +22,7 @@
 	
 	</div>
 	<div class="pure-u-1 pure-u-md-1-4"></div>
-	
-	</div>
+</div>
 
 @end
 

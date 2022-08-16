@@ -1,6 +1,7 @@
 module main
 
 import vweb
+import time
 import crypto.md5
 
 pub fn (mut app App) admin() vweb.Result {
@@ -10,66 +11,102 @@ pub fn (mut app App) admin() vweb.Result {
 }
 
 pub fn (mut app App) r_home() vweb.Result {
-	return app.vweb.redirect('/')
+	return app.redirect('/')
 }
 
 pub fn (mut app App) logout() vweb.Result {
-	if app.auth() { app.vweb.set_cookie(name:'auth_token', value:'') }
+	if app.auth() { app.set_cookie(name:'token', value:'') }
 	return app.r_home()
 }
 
 pub fn (mut app App) settings() vweb.Result {
 	if !app.auth() { return app.r_home() }
-	app.load_settings()
+	app.settings = app.load_settings()
 	return $vweb.html()
+}
+
+pub fn (mut app App) set_login_token(token string) {
+	app.set_cookie_with_expire_date('token',token,time.now().add_days(7))
 }
 
 [post]
 ['/auth_login']
 pub fn (mut app App) auth_login() vweb.Result {
-	if app.auth() { return app.r_home() }
-	
-	username := app.vweb.form['username']
-	password := app.vweb.form['password']
-	
-	// Client Admin Data
-	salt := app.config.client_salt
-	secret := app.config.client_secret
-	usr := app.config.admin_username
-	pswd := app.config.admin_password
-	
-	admin_hash := md5.sum('$salt$secret$usr$pswd'.bytes()).hex()
-	entered_hash := md5.sum('$salt$secret$username$password'.bytes()).hex()
-	
-	if username != '' && password != '' {
-	
-		if entered_hash == admin_hash {
-			app.invalid_userpass = false
-			app.vweb.set_cookie(name:'auth_token', value:admin_hash)
+
+	//println('entering login authentication')
+
+	app.config = load_config()
+
+	form_username := app.form['username']
+	form_password := app.form['password']
+
+	// Validate form data
+	if form_username == '' || form_password == '' {
+		app.invalid_userpass = true
+		//println('invalid form data valid')
+	}else{
+
+		// Does form data match config?
+		salt := app.config.client_salt
+		secret := app.config.client_secret
+		username := app.config.admin_username
+		password := app.config.admin_password
+		email := app.config.admin_email
+
+		//println(app.config.admin_username + ' ' + form_username)
+
+		// Check username
+		if form_username == username {
+			
+			//println('username valid')
+
+			// Validate password with client salt and client secret
+			password_hash := md5.sum('$salt$password$secret'.bytes()).hex()
+			form_password_hash := md5.sum('$salt$form_password$secret'.bytes()).hex()
+
+			if form_password_hash == password_hash {
+
+				auth_token := md5.sum('$salt$password$username$email$secret'.bytes()).hex()
+				app.set_login_token(auth_token)
+
+				app.is_admin = true
+				//println('login successful')
+
+			}else{
+				//println('password is invalid')
+				app.invalid_userpass = true
+			}
+			
 		}else{
 			app.invalid_userpass = true
-			return app.vweb.redirect('/admin')
+			//println('invalid username')
 		}
-	}else{
-		app.invalid_userpass = true
-		return app.vweb.redirect('/admin')
-		
+	
 	}
-	return app.r_home()
+
+	return app.redirect('/')
 }
 
+// Config rework is in progress...
 pub fn (mut app App) auth() bool {
 
-	// Client Admin Data
+	app.config = load_config()
+
+	// Server Admin Data
 	salt := app.config.client_salt
 	secret := app.config.client_secret
-	usr := app.config.admin_username
-	pswd := app.config.admin_password
+	username := app.config.admin_username
+	password := app.config.admin_password
+	email := app.config.admin_email
 
-	token := md5.sum('$salt$secret$usr$pswd'.bytes()).hex()
-	session := app.vweb.get_cookie('auth_token') or { '' }
-	if session != '' {
-		if session == token { return true }
+	auth_token_v := md5.sum('$salt$password$username$email$secret'.bytes()).hex().str()
+	auth_token_is := app.get_cookie('token') or { '' }
+
+	//println(auth_token_v + ' - ' + auth_token_is)
+
+	if auth_token_v == auth_token_is  { // must be true
+		app.is_admin = true
+		return true
 	}
 	return false
 }
