@@ -2,14 +2,13 @@ module main
 
 import os
 import rand
-import time
 import json
 
 const (
 	captial_letters = 'ABCDEFGHIJLMNOPQURSTUVWXYZ'
 	lowercase_letters = 'abcdefghijklmnopqurstuwxyz'
 	numbers = '0123456789'
-	symbols = '!@#$%^&*()_+=|/\:<>{}[]-`,.?'
+	symbols = '!@#$%^&*()_+=<>{}[]-?'
 )
 
 struct Config {
@@ -21,14 +20,17 @@ pub mut:
 	admin_password string
 }
 
-// FROM KRYPTY
+// TODO: Generate random integers in a more secure way
 fn string_generate(n int) string {
     table := captial_letters + lowercase_letters + numbers + symbols
 	characters := table.split('')
     mut str := []string{}
-    rand.seed([u32(time.now().unix), 0])
+	mut seed := rand.intn(100000) or {0}
+    rand.seed([u32(seed), 0])
 	for _ in 0..n {
-		str << characters[rand.intn(characters.len)]
+		seed = rand.intn(100000) or {0}
+    	rand.seed([u32(seed), 0])
+		str << characters[rand.intn(characters.len) or {0} ]
 	}
 	return str.join('')
 }
@@ -36,6 +38,7 @@ fn string_generate(n int) string {
 fn load_config() Config {
 	data := os.read_file('config.json') or { '' }
 	conf := json.decode(Config, data) or {
+		eprintln('Error: Can\'t load config data!')
 		return Config{client_salt:'', client_secret:'', admin_username:'', admin_email:'', admin_password:''}
 	}
 	return conf
@@ -43,16 +46,16 @@ fn load_config() Config {
 
 fn (config Config) save() {
 	data := json.encode(config)
-	println(data)
+	//println(data) // Debug
 	os.write_file('config.json', data) or {
-		eprintln('Error saving configuration.')
+		eprintln('Error: Saving configuration failed.')
 	}
 }
 
 fn generate_config() {
 
 	username := os.input('Blog Username: ')
-	email := os.input('Email: ')
+	email := os.input('Email: ') // TODO: Check for valid email format
 	
 	pass1 := os.input('Enter Password: ')
 	pass2 := os.input('Confirm Password: ')
@@ -71,7 +74,7 @@ fn generate_config() {
 			admin_password: pass1
 		}
 		conf.save()
-		println('Finished.')
+		println('Ready.')
 	}else{
 		println('Passwords do not match...')
 	}

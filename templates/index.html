@@ -1,4 +1,4 @@
-@header
+@include 'header'
 
 <!-- Sidebar -->
 <div class="sidebar pure-u-1 pure-u-md-1-4">
@@ -6,7 +6,7 @@
 
 <div style="padding: 0.25em; background: @app.settings.accent_foreground;"></div>
 <h1 class="blog_title"><a href="/">@app.settings.blog_title</a></h1>
-<p class="blog_desc">@{ app.as_html(app.settings.blog_description) }</p>
+<p class="blog_desc">@{app.as_html(app.settings.blog_description)}</p>
 
 <form class="search pure-form" method="post" action="/searchresults">
 	<input class="search_box pure-input-rounded" style="width: 100%;" type="text" name="search" placeholder="Search..."><br/><br/>
@@ -82,4 +82,4 @@
 
 </div>
 
-@footer
+@include 'footer'
