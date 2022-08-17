@@ -5,8 +5,8 @@ import rand
 import json
 
 const (
-	captial_letters = 'ABCDEFGHIJLMNOPQRSTUVWXYZ'
-	lowercase_letters = 'abcdefghijklmnopqrstuwxyz'
+	captial_letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+	lowercase_letters='abcdefghijklmnopqrstuvwxyz'
 	numbers = '0123456789'
 	symbols = '!@#$%^&*()_+=<>{}[]-?'
 )
