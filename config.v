@@ -5,8 +5,8 @@ import rand
 import json
 
 const (
-	captial_letters = 'ABCDEFGHIJLMNOPQURSTUVWXYZ'
-	lowercase_letters = 'abcdefghijklmnopqurstuwxyz'
+	captial_letters = 'ABCDEFGHIJLMNOPQRSTUVWXYZ'
+	lowercase_letters = 'abcdefghijklmnopqrstuwxyz'
 	numbers = '0123456789'
 	symbols = '!@#$%^&*()_+=<>{}[]-?'
 )
@@ -14,7 +14,7 @@ const (
 struct Config {
 pub mut:
 	client_salt string
-	client_secret string 
+	client_secret string
 	admin_username string
 	admin_email string
 	admin_password string
