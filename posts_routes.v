@@ -53,7 +53,7 @@ pub fn (mut app App) create_new_post() vweb.Result {
 
 ['/view/post/:post_id']
 pub fn (mut app App) viewpost(post_id int) vweb.Result {
-	app.settings = app.load_settings()
+	//app.settings = app.load_settings()
 	post := app.get_post_by_id(post_id)
 	if post.title == '' {
 		return app.r_home()

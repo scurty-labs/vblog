@@ -54,9 +54,12 @@ pub fn (mut app App) init_once() {
 	
 }
 
-pub fn (mut app App) index() vweb.Result {
+// Be sure to keep blog settings updated before each request
+pub fn (mut app App) before_request() {
 	app.settings = app.load_settings() // Must be called first!! TODO: Call in `before_request()`?
+}
 
+pub fn (mut app App) index() vweb.Result {
 	//println(app.get_posts_count().str() + ' - posts per pages: $app.settings.posts_per_page')
 	//println(app.get_posts_page(0, app.settings.posts_per_page.int()))
 
@@ -74,7 +77,7 @@ pub fn (mut app App) as_html(str string) vweb.RawHtml {
 ['/page/:page_num']
 pub fn (mut app App) page(page_num int) vweb.Result {
 	//println('post count: $app.get_posts_count()')
-	app.settings = app.load_settings()
+	//app.settings = app.load_settings()
 	max_pages := app.get_posts_count() / app.settings.posts_per_page.int()
 	mut blog_posts := []Post{}
 	mut invalid := false
