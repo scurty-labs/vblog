@@ -4,6 +4,7 @@ import os
 import rand
 import json
 
+// Pretty sure there's predefined variables for this somewhere?
 const (
 	captial_letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 	lowercase_letters='abcdefghijklmnopqrstuvwxyz'
