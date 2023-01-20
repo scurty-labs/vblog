@@ -1,8 +1,8 @@
 module main
 
 import vweb
-import sqlite
-import markdown
+import db.sqlite
+import markdown // v install markdown
 
 const (
 	port = 8082
