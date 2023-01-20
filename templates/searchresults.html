@@ -47,7 +47,7 @@
 	
 	</div>
 	
-	<div class="post_content">@post.body</div>
+	<div class="post_content">@{ app.as_html(post.body) }</div>
 	<div class="post_footer"></div>
 	
 </div>
