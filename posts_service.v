@@ -17,7 +17,7 @@ pub fn (mut app App) get_posts_count() !int {
 	return num
 }
 
-pub fn (post Post) format_date() string {
+pub fn (post Post) format_date() string { // Bruh...
 	t := time.unix(post.date)
 	return t.format()
 }
