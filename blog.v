@@ -21,10 +21,10 @@ pub mut:
 }
 
 fn main() {
-	mut app := &App{}
+	mut app := &App{} // Initializing a referenced struct like this isn't good practice. We have initializers!
 
 	app.config = load_config()
-	if app.config.client_secret.len == 0 {
+	if app.config.client_secret.len == 0 { // My C days are catching up...
 		println('Cannot find configuration file. Entering setup...')
 		generate_config()
 		exit(1)
@@ -37,7 +37,7 @@ fn main() {
 
 	app.settings = app.load_settings()!
 
-	app.handle_static('static', true)
+	app.handle_static('static', true) // Should be was is
 
 	app.serve_static('/pure-min.css', 'static/css/pure-min.css')
 	app.serve_static('/pure-grids-responsive-min.css', 'static/css/pure-grids-responsive-min.css')
@@ -47,7 +47,7 @@ fn main() {
 }
 
 pub fn (mut app App) init_server() {
-	// Initialize Defaults
+	// Initialize defaults. Note: This is stupid. You have middleware/vweb_global now...
 	app.invalid_userpass = false
 	app.invalid_newpost = false
 }
@@ -72,6 +72,8 @@ pub fn (mut app App) as_html(str string) vweb.RawHtml {
 	return vweb.RawHtml(markdown.to_html(str))
 }
 
+// 'page/:page_num' can change but the link will not be a consistant result over time; better to have a UUID/HASH
+//  for each page and therefore results are unchanging.
 ['/page/:page_num']
 pub fn (mut app App) page(page_num int) !vweb.Result {
 	// println('post count: $app.get_posts_count()')
