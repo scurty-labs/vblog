@@ -3,7 +3,7 @@ module main
 import vweb
 import time
 
-['/edit/post/:post_id']
+@['/edit/post/:post_id']
 pub fn (mut app App) edit(post_id int) !vweb.Result {
 	if !app.auth() {
 		return app.r_home()
@@ -14,7 +14,7 @@ pub fn (mut app App) edit(post_id int) !vweb.Result {
 	return $vweb.html()
 }
 
-['/save/post/:post_id'; post]
+@['/save/post/:post_id'; post]
 pub fn (mut app App) save_post(post_id int) !vweb.Result {
 	if !app.auth() {
 		return app.r_home()
@@ -35,7 +35,7 @@ pub fn (mut app App) save_post(post_id int) !vweb.Result {
 	return app.r_home()
 }
 
-['/new/post'; post]
+@['/new/post'; post]
 pub fn (mut app App) create_new_post() !vweb.Result {
 	if !app.auth() {
 		return app.r_home()
@@ -55,7 +55,7 @@ pub fn (mut app App) create_new_post() !vweb.Result {
 	}
 }
 
-['/view/post/:post_id']
+@['/view/post/:post_id']
 pub fn (mut app App) viewpost(post_id int) !vweb.Result {
 	// app.settings = app.load_settings()
 	post := app.get_post_by_id(post_id)!
@@ -65,7 +65,7 @@ pub fn (mut app App) viewpost(post_id int) !vweb.Result {
 	return $vweb.html()
 }
 
-['/delete/post/:post_id']
+@['/delete/post/:post_id']
 pub fn (mut app App) delete_post_handle(post_id int) !vweb.Result {
 	if !app.auth() {
 		return app.r_home()
@@ -75,7 +75,7 @@ pub fn (mut app App) delete_post_handle(post_id int) !vweb.Result {
 	return app.r_home()
 }
 
-['/searchresults'; post]
+@['/searchresults'; post]
 pub fn (mut app App) searchresults() !vweb.Result {
 	query := app.form['search']
 	mut rel_post := []Post{}
