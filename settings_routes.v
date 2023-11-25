@@ -2,7 +2,7 @@ module main
 
 import vweb
 
-['/save/settings'; post]
+@['/save/settings'; post]
 pub fn (mut app App) save_settings() !vweb.Result {
 	if !app.auth() {
 		return app.r_home()

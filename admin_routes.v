@@ -24,8 +24,8 @@ pub fn (mut app App) settings() vweb.Result {
 	return $vweb.html()
 }
 
-[post]
-['/auth_login']
+@[post]
+@['/auth_login']
 pub fn (mut app App) auth_login() vweb.Result {
 
 	//println('entering login authentication')
