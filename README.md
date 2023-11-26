@@ -4,6 +4,7 @@
 ## Setup
 
 First, be sure to install the V module `markdown` via `v install markdown`.
+Second, make sure you have sqlite3.h via `sudo apt install libsqlite3-dev`
 
 After building with `v .` or `v -prod`, run `./vblog` to setup your configuration file,
 fill out the prompts given, then a config file will be initalized and saved.
