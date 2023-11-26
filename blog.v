@@ -74,7 +74,7 @@ pub fn (mut app App) as_html(str string) vweb.RawHtml {
 
 // 'page/:page_num' can change but the link will not be a consistant result over time; better to have a UUID/HASH
 //  for each page and therefore results are unchanging.
-['/page/:page_num']
+@['/page/:page_num']
 pub fn (mut app App) page(page_num int) !vweb.Result {
 	// println('post count: $app.get_posts_count()')
 	// app.settings = app.load_settings()
