@@ -3,7 +3,7 @@ module main
 import vweb
 
 @['/save/settings'; post]
-pub fn (mut app App) save_settings() !vweb.Result {
+pub fn (mut app App) save_settings() vweb.Result {
 	if !app.auth() {
 		return app.r_home()
 	}
@@ -14,7 +14,7 @@ pub fn (mut app App) save_settings() !vweb.Result {
 	app.settings.accent_foreground = app.form['accent_foreground']
 	app.settings.custom_css = app.form['custom_css']
 	app.settings.posts_per_page = app.form['posts_per_page']
-	app.commit_settings()!
+	app.commit_settings()
 
 	return app.r_home()
 }

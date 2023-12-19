@@ -35,7 +35,7 @@ fn main() {
 		panic(err)
 	}
 
-	app.settings = app.load_settings()!
+	app.settings = app.load_settings()
 
 	app.handle_static('static', true) // Should be was is
 
@@ -54,15 +54,15 @@ pub fn (mut app App) init_server() {
 
 // Be sure to keep blog settings updated before each request
 pub fn (mut app App) before_request() {
-	app.settings = app.load_settings() or { Settings{} } // Must be called first!!
+	app.settings = app.load_settings() // Must be called first!!
 }
 
-pub fn (mut app App) index() !vweb.Result {
+pub fn (mut app App) index() vweb.Result {
 	// println(app.get_posts_count().str() + ' - posts per pages: $app.settings.posts_per_page')
 	// println(app.get_posts_page(0, app.settings.posts_per_page.int()))
 
-	blog_posts := app.get_posts_page(0, app.settings.posts_per_page.int())!
-	max_pages := app.get_posts_count()! / app.settings.posts_per_page.int()
+	blog_posts := app.get_posts_page(0, app.settings.posts_per_page.int())
+	max_pages := app.get_posts_count() / app.settings.posts_per_page.int()
 
 	app.is_admin = app.auth()
 	return $vweb.html()
@@ -75,14 +75,14 @@ pub fn (mut app App) as_html(str string) vweb.RawHtml {
 // 'page/:page_num' can change but the link will not be a consistant result over time; better to have a UUID/HASH
 //  for each page and therefore results are unchanging.
 @['/page/:page_num']
-pub fn (mut app App) page(page_num int) !vweb.Result {
+pub fn (mut app App) page(page_num int) vweb.Result {
 	// println('post count: $app.get_posts_count()')
 	// app.settings = app.load_settings()
-	max_pages := app.get_posts_count()! / app.settings.posts_per_page.int()
+	max_pages := app.get_posts_count() / app.settings.posts_per_page.int()
 	mut blog_posts := []Post{}
 	mut invalid := false
 	if page_num <= max_pages {
-		blog_posts = app.get_posts_page(page_num, app.settings.posts_per_page.int())!
+		blog_posts = app.get_posts_page(page_num, app.settings.posts_per_page.int())
 	} else {
 		invalid = true
 	}
