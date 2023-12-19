@@ -17,10 +17,10 @@ pub mut:
 }
 
 // -- TODO: Change! Use maps instead. --
-pub fn (mut app App) load_settings() !Settings {
+pub fn (mut app App) load_settings() Settings {
 	data := sql app.db {
 		select from Setting
-	}!
+	} or { []Setting{} }
 	mut settings := Settings{}
 	settings.blog_title = setting_get(data, 'blog_title')
 	settings.blog_description = setting_get(data, 'blog_description')

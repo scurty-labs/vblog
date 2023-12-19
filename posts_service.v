@@ -3,17 +3,19 @@ module main
 import vweb
 import time
 
-pub fn (mut app App) get_all_posts() ![]Post {
+pub fn (mut app App) get_all_posts() []Post {
 	posts := sql app.db {
 		select from Post where deleted == 0 order by date desc
-	}!
+	} or { 
+		[]Post{}
+	}
 	return posts
 }
 
-pub fn (mut app App) get_posts_count() !int {
+pub fn (mut app App) get_posts_count() int {
 	num := sql app.db {
 		select count from Post where deleted == 0
-	}!
+	} or { 0 }
 	return num
 }
 
@@ -22,38 +24,44 @@ pub fn (post Post) format_date() string { // Bruh...
 	return t.format()
 }
 
-pub fn (mut app App) get_post_by_id(post_id int) !Post {
+pub fn (mut app App) get_post_by_id(post_id int) Post {
 	post := sql app.db {
 		select from Post where id == post_id limit 1
-	}!
+	} or { []Post{} }
 	return post[0]
 }
 
-pub fn (mut app App) get_posts_page(page_num int, num_per int) ![]Post {
+pub fn (mut app App) get_posts_page(page_num int, num_per int) []Post {
 	offs := page_num * num_per
 	posts := sql app.db {
 		select from Post where deleted == 0 order by date desc limit num_per offset offs
-	}!
+	} or { []Post{} }
 	return posts
 }
 
-pub fn (mut app App) update_post(post_id int, t string, b string) ! {
+pub fn (mut app App) update_post(post_id int, t string, b string) {
 	sql app.db {
 		update Post set title = t, body = b where id == post_id
-	}!
+	} or {
+		eprintln("Couldn't update existing post!")
+	}
 }
 
-pub fn (mut app App) insert_new_post(post Post) ! {
+pub fn (mut app App) insert_new_post(post Post) {
 	// println(post)
 	sql app.db {
 		insert post into Post
-	}!
+	}or {
+		eprintln("Couldn't insert new post!")
+	}
 }
 
-pub fn (mut app App) delete_post(post_id int) ! {
+pub fn (mut app App) delete_post(post_id int) {
 	sql app.db {
 		update Post set deleted = 1 where id == post_id
-	}!
+	}or {
+		eprintln("Couldn't set delete flag on existing post!")
+	}
 }
 
 pub fn (mut app App) newpost() vweb.Result {
