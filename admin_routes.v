@@ -1,45 +1,52 @@
 module main
 
-import vweb
+import veb
 import crypto.md5
 
-pub fn (mut app App) admin() vweb.Result {
-	if app.auth() { return app.r_home() }
-	invalid := app.invalid_userpass
-	return $vweb.html()
+pub fn (mut app App) admin(mut ctx Context) veb.Result {
+	app.prepare(mut ctx)
+	if ctx.is_admin {
+		return app.r_home(mut ctx)
+	}
+	invalid := ctx.invalid_userpass
+	return $veb.html()
 }
 
-pub fn (mut app App) r_home() vweb.Result {
-	return app.redirect('/')
+pub fn (mut app App) r_home(mut ctx Context) veb.Result {
+	return ctx.redirect('/')
 }
 
-pub fn (mut app App) logout() vweb.Result {
-	if app.auth() { app.set_cookie(name:'token', value:'') }
-	return app.r_home()
+pub fn (mut app App) logout(mut ctx Context) veb.Result {
+	if app.auth(ctx) {
+		app.set_login_token(mut ctx, '')
+	}
+	return app.r_home(mut ctx)
 }
 
-pub fn (mut app App) settings() vweb.Result {
-	if !app.auth() { return app.r_home() }
-	//app.settings = app.load_settings()
-	return $vweb.html()
+pub fn (mut app App) settings(mut ctx Context) veb.Result {
+	app.prepare(mut ctx)
+	if !ctx.is_admin {
+		return app.r_home(mut ctx)
+	}
+	return $veb.html()
 }
 
 @[post]
 @['/auth_login']
-pub fn (mut app App) auth_login() vweb.Result {
+pub fn (mut app App) auth_login(mut ctx Context) veb.Result {
 
 	//println('entering login authentication')
 
 	app.config = load_config()
 
-	form_username := app.form['username']
-	form_password := app.form['password']
+	form_username := ctx.form['username'] or { '' }
+	form_password := ctx.form['password'] or { '' }
 
 	// Validate form data
 	if form_username == '' || form_password == '' {
-		app.invalid_userpass = true
+		ctx.invalid_userpass = true
 		//println('invalid form data valid')
-	}else{
+	} else {
 
 		// Does form data match config?
 		salt := app.config.client_salt
@@ -62,22 +69,22 @@ pub fn (mut app App) auth_login() vweb.Result {
 			if form_password_hash == password_hash {
 
 				auth_token := md5.sum('$salt$password$username$email$secret'.bytes()).hex()
-				app.set_login_token(auth_token)
+				app.set_login_token(mut ctx, auth_token)
 
-				app.is_admin = true
+				ctx.is_admin = true
 				//println('login successful')
 
-			}else{
+			} else {
 				//println('password is invalid')
-				app.invalid_userpass = true
+				ctx.invalid_userpass = true
 			}
 
-		}else{
-			app.invalid_userpass = true
+		} else {
+			ctx.invalid_userpass = true
 			//println('invalid username')
 		}
 
 	}
 
-	return app.redirect('/')
+	return ctx.redirect('/')
 }

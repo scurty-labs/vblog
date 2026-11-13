@@ -1,12 +1,12 @@
 module main
 
-import vweb
+import veb
 import time
 
 pub fn (mut app App) get_all_posts() []Post {
 	posts := sql app.db {
 		select from Post where deleted == 0 order by date desc
-	} or { 
+	} or {
 		[]Post{}
 	}
 	return posts
@@ -51,7 +51,7 @@ pub fn (mut app App) insert_new_post(post Post) {
 	// println(post)
 	sql app.db {
 		insert post into Post
-	}or {
+	} or {
 		eprintln("Couldn't insert new post!")
 	}
 }
@@ -59,16 +59,17 @@ pub fn (mut app App) insert_new_post(post Post) {
 pub fn (mut app App) delete_post(post_id int) {
 	sql app.db {
 		update Post set deleted = 1 where id == post_id
-	}or {
+	} or {
 		eprintln("Couldn't set delete flag on existing post!")
 	}
 }
 
-pub fn (mut app App) newpost() vweb.Result {
-	if !app.auth() {
-		return app.r_home()
+pub fn (mut app App) newpost(mut ctx Context) veb.Result {
+	app.prepare(mut ctx)
+	if !ctx.is_admin {
+		return app.r_home(mut ctx)
 	}
-	invalid := app.invalid_newpost
-	app.invalid_newpost = false
-	return $vweb.html()
+	invalid := ctx.invalid_newpost
+	ctx.invalid_newpost = false
+	return $veb.html()
 }

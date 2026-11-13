@@ -1,5 +1,5 @@
 # vblog
-### A simple and fast personal(single user for now) blogging system written in V using VWeb.
+### A simple and fast personal(single user for now) blogging system written in V using veb.
 
 ## Setup
 

@@ -1,6 +1,6 @@
 module main
 
-import vweb
+import veb
 import db.sqlite
 import markdown // v install markdown
 
@@ -8,20 +8,26 @@ const (
 	port = 8082
 )
 
-struct App {
-	vweb.Context
+pub struct Context {
+	veb.Context
 pub mut:
-	db               sqlite.DB
-	config           Config
 	settings         Settings
+	is_admin         bool
 	invalid_userpass bool
 	invalid_newpost  bool
-	is_admin         bool
-	search_res_nr    int
+}
+
+pub struct App {
+	veb.StaticHandler
+pub mut:
+	db            sqlite.DB
+	config        Config
+	settings      Settings
+	search_res_nr int
 }
 
 fn main() {
-	mut app := &App{} // Initializing a referenced struct like this isn't good practice. We have initializers!
+	mut app := &App{}
 
 	app.config = load_config()
 	if app.config.client_secret.len == 0 { // My C days are catching up...
@@ -37,54 +43,49 @@ fn main() {
 
 	app.settings = app.load_settings()
 
-	app.handle_static('static', true) // Should be was is
+	app.handle_static('static', true) or { panic(err) }
 
-	app.serve_static('/pure-min.css', 'static/css/pure-min.css')
-	app.serve_static('/pure-grids-responsive-min.css', 'static/css/pure-grids-responsive-min.css')
-	app.serve_static('/style.css', 'static/css/style.css')
+	app.serve_static('/pure-min.css', 'static/css/pure-min.css') or { panic(err) }
+	app.serve_static('/pure-grids-responsive-min.css', 'static/css/pure-grids-responsive-min.css') or {
+		panic(err)
+	}
+	app.serve_static('/style.css', 'static/css/style.css') or { panic(err) }
 
-	vweb.run(app, port)
+	veb.run[App, Context](mut app, port)
 }
 
-pub fn (mut app App) init_server() {
-	// Initialize defaults. Note: This is stupid. You have middleware/vweb_global now...
-	app.invalid_userpass = false
-	app.invalid_newpost = false
+// prepare loads the current blog settings and admin state for one request.
+pub fn (mut app App) prepare(mut ctx Context) {
+	ctx.settings = app.load_settings()
+	ctx.is_admin = app.auth(ctx)
 }
 
-// Be sure to keep blog settings updated before each request
-pub fn (mut app App) before_request() {
-	app.settings = app.load_settings() // Must be called first!!
+pub fn (mut app App) index(mut ctx Context) veb.Result {
+	app.prepare(mut ctx)
+
+	blog_posts := app.get_posts_page(0, ctx.settings.posts_per_page.int())
+	max_pages := app.get_posts_count() / ctx.settings.posts_per_page.int()
+
+	return $veb.html()
 }
 
-pub fn (mut app App) index() vweb.Result {
-	// println(app.get_posts_count().str() + ' - posts per pages: $app.settings.posts_per_page')
-	// println(app.get_posts_page(0, app.settings.posts_per_page.int()))
-
-	blog_posts := app.get_posts_page(0, app.settings.posts_per_page.int())
-	max_pages := app.get_posts_count() / app.settings.posts_per_page.int()
-
-	app.is_admin = app.auth()
-	return $vweb.html()
-}
-
-pub fn (mut app App) as_html(str string) vweb.RawHtml {
-	return vweb.RawHtml(markdown.to_html(str))
+pub fn (ctx &Context) as_html(str string) veb.RawHtml {
+	return veb.RawHtml(markdown.to_html(str))
 }
 
 // 'page/:page_num' can change but the link will not be a consistant result over time; better to have a UUID/HASH
 //  for each page and therefore results are unchanging.
 @['/page/:page_num']
-pub fn (mut app App) page(page_num int) vweb.Result {
-	// println('post count: $app.get_posts_count()')
-	// app.settings = app.load_settings()
-	max_pages := app.get_posts_count() / app.settings.posts_per_page.int()
+pub fn (mut app App) page(mut ctx Context, page_num int) veb.Result {
+	app.prepare(mut ctx)
+
+	max_pages := app.get_posts_count() / ctx.settings.posts_per_page.int()
 	mut blog_posts := []Post{}
 	mut invalid := false
 	if page_num <= max_pages {
-		blog_posts = app.get_posts_page(page_num, app.settings.posts_per_page.int())
+		blog_posts = app.get_posts_page(page_num, ctx.settings.posts_per_page.int())
 	} else {
 		invalid = true
 	}
-	return $vweb.html()
+	return $veb.html()
 }

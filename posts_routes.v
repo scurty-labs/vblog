@@ -1,83 +1,93 @@
 module main
 
-import vweb
+import veb
 import time
 
 @['/edit/post/:post_id']
-pub fn (mut app App) edit(post_id int) vweb.Result {
-	if !app.auth() {
-		return app.r_home()
+pub fn (mut app App) edit(mut ctx Context, post_id int) veb.Result {
+	app.prepare(mut ctx)
+	if !ctx.is_admin {
+		return app.r_home(mut ctx)
 	}
 	post := app.get_post_by_id(post_id)
-	invalid := app.invalid_newpost
-	app.invalid_newpost = false // I GUESS THIS IS A GLOBAL VARIABLE?! Lol...
-	return $vweb.html()
+	invalid := ctx.invalid_newpost
+	ctx.invalid_newpost = false
+	return $veb.html()
 }
 
 @['/save/post/:post_id'; post]
-pub fn (mut app App) save_post(post_id int) vweb.Result {
-	if !app.auth() {
-		return app.r_home()
+pub fn (mut app App) save_post(mut ctx Context, post_id int) veb.Result {
+	app.prepare(mut ctx)
+	if !ctx.is_admin {
+		return app.r_home(mut ctx)
 	}
 
-	title := app.form['post_title']
-	body := app.form['post_body']
-	app.invalid_newpost = false
+	title := ctx.form['post_title'] or { '' }
+	body := ctx.form['post_body'] or { '' }
+	ctx.invalid_newpost = false
 
 	if title != '' && body != '' {
-		app.invalid_newpost = false
+		ctx.invalid_newpost = false
 		app.update_post(post_id, title, body)
-		return app.r_home()
+		return app.r_home(mut ctx)
 	} else {
-		app.invalid_newpost = true
-		return app.redirect('/edit/post/${post_id}/')
+		ctx.invalid_newpost = true
+		return ctx.redirect('/edit/post/${post_id}/')
 	}
-	return app.r_home()
+	return app.r_home(mut ctx)
 }
 
 @['/new/post'; post]
-pub fn (mut app App) create_new_post() vweb.Result {
-	if !app.auth() {
-		return app.r_home()
+pub fn (mut app App) create_new_post(mut ctx Context) veb.Result {
+	app.prepare(mut ctx)
+	if !ctx.is_admin {
+		return app.r_home(mut ctx)
 	}
 
-	title := app.form['post_title']
-	body := app.form['post_body']
-	app.invalid_newpost = false
+	title := ctx.form['post_title'] or { '' }
+	body := ctx.form['post_body'] or { '' }
+	ctx.invalid_newpost = false
 
 	if title.len > 0 && body.len > 0 { // Seems to not like large data in `body`
 		t := time.now()
-		app.insert_new_post(Post{ title: title, body: body, date: t.unix_time() })
-		return app.r_home()
+		app.insert_new_post(Post{
+			title: title
+			body: body
+			date: t.unix()
+		})
+		return app.r_home(mut ctx)
 	} else {
-		app.invalid_newpost = true
-		return app.redirect('/newpost')
+		ctx.invalid_newpost = true
+		return ctx.redirect('/newpost')
 	}
 }
 
 @['/view/post/:post_id']
-pub fn (mut app App) viewpost(post_id int) vweb.Result {
-	// app.settings = app.load_settings()
+pub fn (mut app App) viewpost(mut ctx Context, post_id int) veb.Result {
+	app.prepare(mut ctx)
 	post := app.get_post_by_id(post_id)
 	if post.title == '' {
-		return app.r_home()
+		return app.r_home(mut ctx)
 	}
-	return $vweb.html()
+	return $veb.html()
 }
 
 @['/delete/post/:post_id']
-pub fn (mut app App) delete_post_handle(post_id int) vweb.Result {
-	if !app.auth() {
-		return app.r_home()
+pub fn (mut app App) delete_post_handle(mut ctx Context, post_id int) veb.Result {
+	app.prepare(mut ctx)
+	if !ctx.is_admin {
+		return app.r_home(mut ctx)
 	}
 
 	app.delete_post(post_id)
-	return app.r_home()
+	return app.r_home(mut ctx)
 }
 
 @['/searchresults'; post]
-pub fn (mut app App) searchresults() vweb.Result {
-	query := app.form['search']
+pub fn (mut app App) searchresults(mut ctx Context) veb.Result {
+	app.prepare(mut ctx)
+
+	query := ctx.form['search'] or { '' }
 	mut rel_post := []Post{}
 
 	if query.len >= 1 {
@@ -88,5 +98,5 @@ pub fn (mut app App) searchresults() vweb.Result {
 		}
 	}
 
-	return $vweb.html()
+	return $veb.html()
 }
