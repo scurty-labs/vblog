@@ -1,5 +1,27 @@
 module main
 
+// Typed, single-row blog settings. The row always has id == 1.
+struct Settings {
+pub mut:
+	id                int
+	blog_title        string
+	blog_description  string
+	accent_foreground string
+	custom_css        string
+	posts_per_page    int
+}
+
+fn default_settings() Settings {
+	return Settings{
+		id:                1
+		blog_title:        'My Blog'
+		blog_description:  'A personal blogging system written in V.'
+		accent_foreground: '#007711'
+		posts_per_page:    10
+	}
+}
+
+// Legacy key/value row, kept only so existing databases can be migrated.
 struct Setting {
 pub mut:
 	id    int
@@ -7,35 +29,22 @@ pub mut:
 	value string
 }
 
-struct Settings {
-pub mut:
-	blog_title        string
-	blog_description  string
-	accent_foreground string
-	custom_css        string
-	posts_per_page    string
-}
-
-// -- TODO: Change! Use maps instead. --
 pub fn (mut app App) load_settings() Settings {
-	data := sql app.db {
-		select from Setting
-	} or { []Setting{} }
-	mut settings := Settings{}
-	settings.blog_title = setting_get(data, 'blog_title')
-	settings.blog_description = setting_get(data, 'blog_description')
-	settings.accent_foreground = setting_get(data, 'accent_foreground')
-	settings.custom_css = setting_get(data, 'custom_css')
-	settings.posts_per_page = setting_get(data, 'posts_per_page')
-	return settings
+	rows := sql app.db {
+		select from Settings where id == 1 limit 1
+	} or { []Settings{} }
+	if rows.len == 0 {
+		return default_settings()
+	}
+	return rows[0]
 }
 
-// Cringe...
-fn setting_get(arr []Setting, key string) string {
-	for i in arr {
-		if i.key == key {
-			return i.value
-		}
+fn clamp_posts_per_page(n int) int {
+	if n < 1 {
+		return 1
 	}
-	return ''
+	if n > 100 {
+		return 100
+	}
+	return n
 }

@@ -15,6 +15,7 @@ pub mut:
 	is_admin         bool
 	invalid_userpass bool
 	invalid_newpost  bool
+	invalid_settings bool
 }
 
 pub struct App {
@@ -22,7 +23,6 @@ pub struct App {
 pub mut:
 	db            sqlite.DB
 	config        Config
-	settings      Settings
 	search_res_nr int
 }
 
@@ -41,7 +41,7 @@ fn main() {
 		panic(err)
 	}
 
-	app.settings = app.load_settings()
+	app.ensure_settings_schema()
 
 	app.handle_static('static', true) or { panic(err) }
 
@@ -63,7 +63,7 @@ pub fn (mut app App) prepare(mut ctx Context) {
 pub fn (mut app App) index(mut ctx Context) veb.Result {
 	app.prepare(mut ctx)
 
-	per_page := ctx.settings.posts_per_page.int()
+	per_page := ctx.settings.posts_per_page
 	blog_posts := app.get_posts_page(1, per_page)
 	total_pages := app.get_pages_count(per_page)
 
@@ -80,7 +80,7 @@ pub fn (ctx &Context) as_html(str string) veb.RawHtml {
 pub fn (mut app App) page(mut ctx Context, page_num int) veb.Result {
 	app.prepare(mut ctx)
 
-	per_page := ctx.settings.posts_per_page.int()
+	per_page := ctx.settings.posts_per_page
 	total_pages := app.get_pages_count(per_page)
 	mut blog_posts := []Post{}
 	mut invalid := false

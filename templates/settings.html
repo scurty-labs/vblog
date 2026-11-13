@@ -10,6 +10,9 @@
 	
 	<div class="pure-u-1 pure-u-md-1-4"></div>
 	<div class="page_content pure-u-1 pure-u-md-1-2">
+		@if ctx.invalid_settings
+		<p style="color: #b00020;">Couldn't save settings. Please try again.</p>
+		@end
 		<form class="pure-form" method="post" action="save/settings">
 			<input style="width: 100%;" type="text" name="blog_title" value="@ctx.settings.blog_title"><br/><br/>
 			<textarea style="width: 100%;" name="blog_description">@ctx.settings.blog_description</textarea><br/><br/>
