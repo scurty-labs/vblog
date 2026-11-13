@@ -2,7 +2,7 @@ module main
 
 import os
 import rand
-import json
+import json2
 
 // Pretty sure there's predefined variables for this somewhere? Yes. Change later.
 const (
@@ -38,13 +38,13 @@ fn string_generate(n int) string {
 
 fn load_config() Config {
 	data := os.read_file('config.json') or { '' }
-	conf := json.decode(Config, data) or {
+	conf := json2.decode[Config](data) or {
 		eprintln("Error: Can't load config data!")
 		return Config{
-			client_salt: ''
-			client_secret: ''
+			client_salt:    ''
+			client_secret:  ''
 			admin_username: ''
-			admin_email: ''
+			admin_email:    ''
 			admin_password: ''
 		}
 	}
@@ -52,7 +52,7 @@ fn load_config() Config {
 }
 
 fn (config Config) save() {
-	data := json.encode(config)
+	data := json2.encode(config)
 	// println(data) // Debug
 	os.write_file('config.json', data) or { eprintln('Error: Saving configuration failed.') }
 }
@@ -72,10 +72,10 @@ fn generate_config() { // I am a complete idiot
 		secret := string_generate(64)
 
 		conf := &Config{
-			client_salt: salt
-			client_secret: secret
+			client_salt:    salt
+			client_secret:  secret
 			admin_username: username
-			admin_email: email
+			admin_email:    email
 			admin_password: pass1
 		}
 		conf.save()
