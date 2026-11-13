@@ -63,8 +63,9 @@ pub fn (mut app App) prepare(mut ctx Context) {
 pub fn (mut app App) index(mut ctx Context) veb.Result {
 	app.prepare(mut ctx)
 
-	blog_posts := app.get_posts_page(0, ctx.settings.posts_per_page.int())
-	max_pages := app.get_posts_count() / ctx.settings.posts_per_page.int()
+	per_page := ctx.settings.posts_per_page.int()
+	blog_posts := app.get_posts_page(1, per_page)
+	total_pages := app.get_pages_count(per_page)
 
 	return $veb.html()
 }
@@ -79,11 +80,12 @@ pub fn (ctx &Context) as_html(str string) veb.RawHtml {
 pub fn (mut app App) page(mut ctx Context, page_num int) veb.Result {
 	app.prepare(mut ctx)
 
-	max_pages := app.get_posts_count() / ctx.settings.posts_per_page.int()
+	per_page := ctx.settings.posts_per_page.int()
+	total_pages := app.get_pages_count(per_page)
 	mut blog_posts := []Post{}
 	mut invalid := false
-	if page_num <= max_pages {
-		blog_posts = app.get_posts_page(page_num, ctx.settings.posts_per_page.int())
+	if page_num >= 1 && page_num <= total_pages {
+		blog_posts = app.get_posts_page(page_num, per_page)
 	} else {
 		invalid = true
 	}

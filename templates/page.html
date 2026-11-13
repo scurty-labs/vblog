@@ -30,7 +30,7 @@
 
 @if !invalid
 
-<p>Page: @page_num of @max_pages</p>
+<p>Page: @page_num of @total_pages</p>
 @for post in blog_posts
 <div class="blog_post">
 	
@@ -51,11 +51,11 @@
 @end
 
 <!-- PAGINATION -->
-@if max_pages>0
+@if total_pages > 1
 
 <div class="pagination pure-menu pure-menu-horizontal">
 <ul class="page_list pure-menu-list">
-@for page := 0; page <= max_pages; page++
+@for page := 1; page <= total_pages; page++
 	@if page != page_num
 	<li class="pure-menu-item">
 		<a href="/page/@page" class="pure-menu-link">@page</a>

@@ -9,7 +9,7 @@ pub fn (mut app App) edit(mut ctx Context, post_id int) veb.Result {
 	if !ctx.is_admin {
 		return app.r_home(mut ctx)
 	}
-	post := app.get_post_by_id(post_id)
+	post := app.get_post_by_id(post_id) or { return app.r_home(mut ctx) }
 	invalid := ctx.invalid_newpost
 	ctx.invalid_newpost = false
 	return $veb.html()
@@ -65,7 +65,7 @@ pub fn (mut app App) create_new_post(mut ctx Context) veb.Result {
 @['/view/post/:post_id']
 pub fn (mut app App) viewpost(mut ctx Context, post_id int) veb.Result {
 	app.prepare(mut ctx)
-	post := app.get_post_by_id(post_id)
+	post := app.get_post_by_id(post_id) or { return app.r_home(mut ctx) }
 	if post.title == '' {
 		return app.r_home(mut ctx)
 	}

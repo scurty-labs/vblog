@@ -24,15 +24,26 @@ pub fn (post Post) format_date() string { // Bruh...
 	return t.format()
 }
 
-pub fn (mut app App) get_post_by_id(post_id int) Post {
-	post := sql app.db {
+pub fn (mut app App) get_post_by_id(post_id int) ?Post {
+	posts := sql app.db {
 		select from Post where id == post_id limit 1
 	} or { []Post{} }
-	return post[0]
+	if posts.len == 0 {
+		return none
+	}
+	return posts[0]
+}
+
+pub fn (mut app App) get_pages_count(num_per int) int {
+	if num_per <= 0 {
+		return 0
+	}
+	count := app.get_posts_count()
+	return (count + num_per - 1) / num_per
 }
 
 pub fn (mut app App) get_posts_page(page_num int, num_per int) []Post {
-	offs := page_num * num_per
+	offs := (page_num - 1) * num_per
 	posts := sql app.db {
 		select from Post where deleted == 0 order by date desc limit num_per offset offs
 	} or { []Post{} }

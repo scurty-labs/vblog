@@ -62,11 +62,11 @@
 
 -->
 
-@if max_pages>0
+@if total_pages > 1
 
 <div class="pagination pure-menu pure-menu-horizontal">
 <ul class="pure-menu-list">
-@for page := 0; page <= max_pages; page++
+@for page := 1; page <= total_pages; page++
 	<li class="pure-menu-item">
 		<a href="/page/@page" class="pure-menu-link">@page</a>
 	</li>
