@@ -25,7 +25,7 @@ pub fn (mut app App) auth(ctx &Context) bool {
 	password := app.config.admin_password
 	email := app.config.admin_email
 
-	auth_token_v := md5.sum('$salt$password$username$email$secret'.bytes()).hex().str()
+	auth_token_v := md5.sum('${salt}${password}${username}${email}${secret}'.bytes()).hex().str()
 	auth_token_is := ctx.get_cookie('token') or { '' }
 
 	//println(auth_token_v + ' - ' + auth_token_is)

@@ -63,12 +63,12 @@ pub fn (mut app App) auth_login(mut ctx Context) veb.Result {
 			//println('username valid')
 
 			// Validate password with client salt and client secret
-			password_hash := md5.sum('$salt$password$secret'.bytes()).hex()
-			form_password_hash := md5.sum('$salt$form_password$secret'.bytes()).hex()
+			password_hash := md5.sum('${salt}${password}${secret}'.bytes()).hex()
+			form_password_hash := md5.sum('${salt}${form_password}${secret}'.bytes()).hex()
 
 			if form_password_hash == password_hash {
 
-				auth_token := md5.sum('$salt$password$username$email$secret'.bytes()).hex()
+				auth_token := md5.sum('${salt}${password}${username}${email}${secret}'.bytes()).hex()
 				app.set_login_token(mut ctx, auth_token)
 
 				ctx.is_admin = true
