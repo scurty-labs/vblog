@@ -1,0 +1,15 @@
+/* Dark: near-black page with cool grey text. */
+:root {
+	--page-bg: #14171a;
+	--surface: #0b0d0f;
+	--surface-text: #8b949e;
+	--heading: #f0f6fc;
+	--text: #c9d1d9;
+	--muted: #8b949e;
+	--link-muted: #8b949e;
+	--code-bg: #1f2428;
+	--code-text: #c9d1d9;
+	--input-bg: #1f2428;
+	--input-text: #f0f6fc;
+	--input-focus-bg: #30363d;
+}

@@ -17,4 +17,4 @@ Go to `localhost:8082/admin` for login prompt. Port 8082 is default for testing.
 - Create/Edit/Delete Posts
 - Settings for Blog Title, Description and Accent Color.
 - Basic Search
-- Custom CSS (Alpha)
+- Runtime-selectable themes (default, dark, sepia, ocean)

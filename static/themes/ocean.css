@@ -1,0 +1,15 @@
+/* Ocean: pale blue page with deep navy surfaces. */
+:root {
+	--page-bg: #e6f0f5;
+	--surface: #0b3c5d;
+	--surface-text: #b8d0dd;
+	--heading: #ffffff;
+	--text: #16313f;
+	--muted: #6a8794;
+	--link-muted: #6a8794;
+	--code-bg: #d3e4ec;
+	--code-text: #16313f;
+	--input-bg: #10455f;
+	--input-text: #ffffff;
+	--input-focus-bg: #1a6785;
+}

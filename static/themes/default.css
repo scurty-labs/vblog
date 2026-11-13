@@ -1,0 +1,15 @@
+/* Default: light page, dark surfaces, green accent. */
+:root {
+	--page-bg: #dddddd;
+	--surface: #1f1f1f;
+	--surface-text: #999999;
+	--heading: #ffffff;
+	--text: #000000;
+	--muted: #aaaaaa;
+	--link-muted: #888888;
+	--code-bg: #d2d2d2;
+	--code-text: #333333;
+	--input-bg: #222222;
+	--input-text: #ffffff;
+	--input-focus-bg: #666666;
+}

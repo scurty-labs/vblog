@@ -12,6 +12,7 @@ pub struct Context {
 	veb.Context
 pub mut:
 	settings         Settings
+	themes           []string
 	is_admin         bool
 	invalid_userpass bool
 	invalid_newpost  bool

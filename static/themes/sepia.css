@@ -1,0 +1,15 @@
+/* Sepia: warm paper page with brown surfaces. */
+:root {
+	--page-bg: #f4ecd8;
+	--surface: #4a3f35;
+	--surface-text: #d8cbb8;
+	--heading: #fff7e6;
+	--text: #3b3229;
+	--muted: #8a7a66;
+	--link-muted: #8a7a66;
+	--code-bg: #e6dcc3;
+	--code-text: #4a3f35;
+	--input-bg: #5c4f42;
+	--input-text: #fff7e6;
+	--input-focus-bg: #6b5c4d;
+}

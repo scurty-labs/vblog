@@ -20,8 +20,16 @@
 			<input type="number" name="posts_per_page" min="1" max="100" value="@ctx.settings.posts_per_page">
 			<p>Accent Color</p>
 			<input type="text" name="accent_foreground" value="@ctx.settings.accent_foreground"><br/><br/>
-			<p>Custom CSS</p>
-			<textarea style="width: 100%; max-width: 100%; min-width: 100%;" name="custom_css">@ctx.settings.custom_css</textarea><br/><br/>
+			<p>Theme</p>
+			<select name="theme">
+@for theme in ctx.themes
+	@if theme == ctx.settings.theme
+				<option value="@theme" selected>@theme</option>
+	@else
+				<option value="@theme">@theme</option>
+	@end
+@end
+			</select><br/><br/>
 			<br/>
 			<button class="button-success pure-button" type="submit" >Save</button>
 		</form>

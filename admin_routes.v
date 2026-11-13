@@ -28,6 +28,7 @@ pub fn (mut app App) settings(mut ctx Context) veb.Result {
 	if !ctx.is_admin {
 		return app.r_home(mut ctx)
 	}
+	ctx.themes = available_themes()
 	return $veb.html()
 }
 

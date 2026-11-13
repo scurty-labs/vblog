@@ -1,3 +1,20 @@
+:root {
+	/* Overridden by the selected stylesheet in static/themes. */
+	--accent: #007711;
+	--page-bg: #dddddd;
+	--surface: #1f1f1f;
+	--surface-text: #999999;
+	--heading: #ffffff;
+	--text: #000000;
+	--muted: #aaaaaa;
+	--link-muted: #888888;
+	--code-bg: #d2d2d2;
+	--code-text: #333333;
+	--input-bg: #222222;
+	--input-text: #ffffff;
+	--input-focus-bg: #666666;
+}
+
 * {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -6,21 +23,31 @@
 
 
 body {
-	background: #dddddd;
+	background: var(--page-bg);
+	color: var(--text);
+}
+
+.accent_bar {
+	padding: 0.25em;
+	background: var(--accent);
+}
+
+.accent_text {
+	color: var(--accent);
 }
 
 .blog_title a {
 	text-decoration: none;
-	color: #ffffff;
+	color: var(--heading);
 }
 
 .sidebar {
-	background-color: #1f1f1f;
+	background-color: var(--surface);
 }
 
 .sidebar_content {
 	text-align: center;
-	color: #999999;
+	color: var(--surface-text);
 }
 
 .sidebar_content .blog_title {
@@ -38,15 +65,15 @@ body {
 }
 
 .sidebar .search input {
-	background: #222222;
+	background: var(--input-bg);
 	border: 5px;
-	border-color: #333333;
+	border-color: var(--surface);
 	box-shadow: none;
-	color: #ffffff;
+	color: var(--input-text);
 }
 
 .sidebar .search input:focus {
-	background: #666666;
+	background: var(--input-focus-bg);
 }
 
 .content {
@@ -56,13 +83,13 @@ body {
 .blog_footer {
 	margin: 0px 0px;
 	padding: 1em;
-	background: #1f1f1f;
-	color: #999999;
+	background: var(--surface);
+	color: var(--surface-text);
 }
 
 #admin_controls {
 	padding: 1em;
-	background: #1f1f1f;
+	background: var(--surface);
 }
 
 /* --- FORM/INPUT --- */
@@ -107,8 +134,8 @@ body {
 .page_header {
 
 	text-align: center;
-	color: #ffffff;
-	background: #1f1f1f;
+	color: var(--heading);
+	background: var(--surface);
 	padding: 0.5em;
 	margin-bottom: 1em;
 	
@@ -143,16 +170,16 @@ body {
 
 .post_title a {
 	text-decoration: none;
-	color: #000000;
+	color: var(--text);
 }
 
 .post_actions, .post_actions a {
 	text-decoration: none;
-	color: #888888;
+	color: var(--link-muted);
 }
 
 .post_meta {
-	color: #aaaaaa;
+	color: var(--muted);
 }
 
 .post_content {
@@ -166,23 +193,23 @@ body {
 }
 
 .post_content a:visited {
-	color: #222222;
+	color: var(--text);
 }
 .post_content pre {
 	border-radius: 4px;
 	padding: 0.5em;
-	background: #d2d2d2;
-	color: #333333;
+	background: var(--code-bg);
+	color: var(--code-text);
 }
 .post_content code {
-	background: #d2d2d2;
-	color: #333333;
+	background: var(--code-bg);
+	color: var(--code-text);
 	border-radius: 4px;
 }
 
 .view_post_header {
-	color: #ffffff;
-	background: #1f1f1f;
+	color: var(--heading);
+	background: var(--surface);
 	padding: 5em 3em;
     font-size: x-large;
     text-align: center;
