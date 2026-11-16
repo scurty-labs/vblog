@@ -1,0 +1,72 @@
+@import url("/themes/_glass.css");
+
+/* Neon: cyberpunk glass. Flush-left rail, crisp sans type. */
+:root {
+	--page-bg: #05060b;
+	--glow-a: rgba(34, 211, 238, 0.3);
+	--glow-b: rgba(232, 121, 249, 0.26);
+	--glow-c: rgba(59, 130, 246, 0.2);
+	--panel: rgba(12, 18, 32, 0.5);
+	--panel-strong: rgba(20, 28, 46, 0.68);
+	--panel-border: rgba(34, 211, 238, 0.22);
+	--hairline: rgba(34, 211, 238, 0.5);
+	--shadow: 0 0 24px rgba(34, 211, 238, 0.06), 0 22px 52px rgba(0, 0, 0, 0.6);
+	--text: #d9e6ff;
+	--heading: #ffffff;
+	--muted: #8fa6c9;
+	--surface-text: #b9d0ef;
+	--link: #67e8f9;
+	--code-bg: rgba(6, 12, 24, 0.82);
+	--code-text: #a5f3fc;
+	--input-bg: rgba(8, 14, 26, 0.7);
+	--input-text: #eaf6ff;
+	--input-focus-bg: rgba(34, 211, 238, 0.12);
+	--noise: 0.2;
+	--radius: 4px;
+	--drift: 18s;
+	--lift: -2px;
+}
+
+body.theme-neon {
+	font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+	letter-spacing: 0.005em;
+}
+
+.theme-neon .site-title,
+.theme-neon .post_title,
+.theme-neon .view_post_header .post_title,
+.theme-neon .dash-title {
+	font-family: inherit;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+}
+
+.theme-neon .site-title {
+	font-size: 1.3rem;
+}
+
+.theme-neon .post-meta,
+.theme-neon .field-label,
+.theme-neon .stat-label,
+.theme-neon .site-description {
+	text-transform: uppercase;
+	letter-spacing: 0.18em;
+}
+
+.theme-neon .post-card:hover {
+	border-color: var(--hairline);
+	box-shadow: 0 0 20px rgba(34, 211, 238, 0.1), 0 22px 48px rgba(0, 0, 0, 0.55);
+}
+
+.theme-neon .site-title a {
+	color: #ffffff;
+	text-shadow: 0 0 18px rgba(34, 211, 238, 0.5);
+}
+
+.theme-neon .button-success {
+	box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.theme-neon .post_content a {
+	text-decoration-style: dotted;
+}

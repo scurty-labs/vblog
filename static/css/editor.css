@@ -1,0 +1,256 @@
+/* Markdown editor.
+   EasyMDE is vendored locally; these rules give it the same frosted-glass skin
+   as the rest of the app and use the active theme's tokens. */
+
+.editor-form {
+	display: flex;
+	flex-direction: column;
+	gap: 1.15rem;
+}
+
+.editor-title-input {
+	padding: 0.75rem 0.9rem;
+	font-size: 1.35rem;
+	font-weight: 700;
+	letter-spacing: -0.01em;
+}
+
+.editor-body-field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.45rem;
+}
+
+.editor-meta-row {
+	align-items: flex-start;
+}
+
+.editor-meta-row .field {
+	flex: 1 1 14rem;
+}
+
+.editor-hint {
+	margin-left: 0.45rem;
+	color: var(--muted);
+	font-size: 0.76rem;
+	font-weight: 500;
+	letter-spacing: 0;
+	text-transform: none;
+}
+
+.editor-actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
+}
+
+.editor-buttons {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.6rem;
+}
+
+.editor-note {
+	color: var(--muted);
+	font-size: 0.82rem;
+}
+
+/* --- TOOLBAR --- */
+
+.editor-toolbar {
+	position: sticky;
+	top: 0;
+	z-index: 6;
+	display: flex;
+	flex-wrap: wrap;
+	height: auto;
+	padding: 0.35rem 0.45rem;
+	border: 1px solid var(--panel-border);
+	border-bottom: 0;
+	border-radius: var(--radius) var(--radius) 0 0;
+	background: var(--panel);
+	opacity: 1;
+	box-shadow: 0 10px 24px -22px #000;
+}
+
+/* EasyMDE renders its buttons as <button>; older builds used <a>. Style both so
+   the glyphs keep their contrast against every theme's toolbar. */
+.editor-toolbar a,
+.editor-toolbar button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2rem;
+	height: 2rem;
+	margin: 0.1rem;
+	color: var(--text) !important;
+	background: transparent;
+	border: 1px solid transparent;
+	border-radius: var(--radius-sm);
+}
+
+.editor-toolbar a:hover,
+.editor-toolbar a.active,
+.editor-toolbar button:hover,
+.editor-toolbar button.active {
+	color: var(--heading) !important;
+	background: var(--panel-strong);
+	border-color: var(--hairline);
+}
+
+.editor-toolbar a .fa,
+.editor-toolbar button .fa {
+	color: inherit;
+}
+
+/* Fullscreen keeps the themed surface instead of EasyMDE's white sheet. */
+.editor-toolbar.fullscreen {
+	background: var(--page-bg);
+	border-bottom: 1px solid var(--panel-border);
+}
+
+.editor-toolbar.fullscreen::before,
+.editor-toolbar.fullscreen::after {
+	display: none;
+}
+
+.editor-toolbar i.separator {
+	border-left-color: var(--panel-border);
+	border-right-color: transparent;
+}
+
+.editor-toolbar.disabled-for-preview a:not(.no-disable),
+.editor-toolbar.disabled-for-preview button:not(.no-disable) {
+	background: transparent;
+	opacity: 0.35;
+}
+
+/* --- EDITOR / PREVIEW --- */
+
+.EasyMDEContainer .CodeMirror {
+	min-height: 30rem;
+	padding: 0.65rem 0.4rem;
+	border: 1px solid var(--panel-border);
+	border-radius: 0 0 var(--radius) var(--radius);
+	background: var(--input-bg);
+	color: var(--input-text);
+	font-family: ui-monospace, SFMono-Regular, "Cascadia Mono", Menlo, Consolas, monospace;
+	font-size: 0.95rem;
+	line-height: 1.75;
+}
+
+.EasyMDEContainer .CodeMirror-scroll {
+	min-height: 30rem;
+}
+
+.EasyMDEContainer .CodeMirror-cursor {
+	border-left: 2px solid var(--text);
+}
+
+.EasyMDEContainer .CodeMirror-selected {
+	background: color-mix(in srgb, var(--accent) 26%, transparent) !important;
+}
+
+.EasyMDEContainer .CodeMirror-focused .CodeMirror-selected {
+	background: color-mix(in srgb, var(--accent) 34%, transparent) !important;
+}
+
+.CodeMirror-cursor,
+.cm-s-easymde .cm-header {
+	color: var(--heading);
+}
+
+.cm-s-easymde .cm-header {
+	font-weight: 700;
+}
+
+.cm-s-easymde .cm-link,
+.cm-s-easymde .cm-url,
+.cm-s-easymde .cm-string {
+	color: var(--link);
+}
+
+.cm-s-easymde .cm-quote {
+	color: var(--muted);
+}
+
+.cm-s-easymde .cm-comment {
+	background: var(--code-bg);
+	color: var(--code-text);
+	border-radius: 4px;
+}
+
+.CodeMirror-sided {
+	border-radius: 0 0 0 var(--radius) !important;
+}
+
+.editor-preview-side {
+	padding: 1.1rem 1.35rem;
+	border: 1px solid var(--panel-border);
+	border-radius: 0 0 var(--radius) 0;
+	background: color-mix(in srgb, var(--page-bg) 86%, #000);
+	color: var(--text);
+}
+
+.editor-preview-side p,
+.editor-preview-side li {
+	color: var(--text);
+	line-height: 1.75;
+}
+
+.editor-preview-side h1,
+.editor-preview-side h2,
+.editor-preview-side h3,
+.editor-preview-side h4 {
+	color: var(--heading);
+	letter-spacing: -0.01em;
+}
+
+.editor-preview-side a {
+	color: var(--link);
+}
+
+.editor-preview-side code,
+.editor-preview-side pre {
+	border-radius: var(--radius-sm);
+	background: var(--code-bg);
+	color: var(--code-text);
+}
+
+.editor-preview-side blockquote {
+	margin-left: 0;
+	padding-left: 1rem;
+	border-left: 2px solid var(--accent);
+	color: var(--muted);
+}
+
+.editor-preview-side table {
+	border-color: var(--panel-border);
+}
+
+.editor-preview-side th,
+.editor-preview-side td {
+	border: 1px solid var(--panel-border);
+	padding: 0.35rem 0.6rem;
+}
+
+.editor-statusbar {
+	padding: 0.4rem 0.2rem 0;
+	color: var(--muted);
+	font-size: 0.76rem;
+	letter-spacing: 0.04em;
+}
+
+@media (max-width: 62em) {
+	.EasyMDEContainer .CodeMirror,
+	.EasyMDEContainer .CodeMirror-scroll {
+		min-height: 55vh;
+	}
+
+	.editor-note {
+		order: 2;
+	}
+}

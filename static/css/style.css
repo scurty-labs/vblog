@@ -1,5 +1,5 @@
 :root {
-	/* Overridden by the selected stylesheet in static/themes. */
+	/* Palette variables are overridden by the selected file in static/themes. */
 	--accent: #007711;
 	--page-bg: #dddddd;
 	--surface: #1f1f1f;
@@ -8,6 +8,7 @@
 	--text: #000000;
 	--muted: #aaaaaa;
 	--link-muted: #888888;
+	--link: #0b5fbd;
 	--code-bg: #d2d2d2;
 	--code-text: #333333;
 	--input-bg: #222222;
@@ -16,19 +17,61 @@
 }
 
 * {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
+	box-sizing: border-box;
 }
 
+html {
+	scroll-behavior: smooth;
+}
 
 body {
+	margin: 0;
 	background: var(--page-bg);
 	color: var(--text);
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	line-height: 1.65;
+	-webkit-font-smoothing: antialiased;
+}
+
+img,
+svg,
+video {
+	max-width: 100%;
+	height: auto;
+}
+
+a {
+	color: var(--link);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	line-height: 1.2;
+}
+
+:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
+}
+
+/* --- SHARED PIECES ---
+   Everything positional lives in the theme stylesheet, so a theme can change
+   the layout without fighting these rules. */
+
+.site-shell,
+.site-main {
+	position: relative;
+}
+
+.site-main {
+	min-width: 0;
 }
 
 .accent_bar {
-	padding: 0.25em;
 	background: var(--accent);
 }
 
@@ -37,202 +80,585 @@ body {
 }
 
 .blog_title a {
-	text-decoration: none;
 	color: var(--heading);
+	text-decoration: none;
 }
 
-.sidebar {
-	background-color: var(--surface);
+/* Scroll reveal. Only active with JS so content is never hidden without it. */
+.js .reveal {
+	opacity: 0;
+	transform: translateY(14px);
+	transition: opacity .6s ease, transform .6s cubic-bezier(.2, .7, .2, 1);
 }
 
-.sidebar_content {
-	text-align: center;
-	color: var(--surface-text);
+.js .reveal.is-visible {
+	opacity: 1;
+	transform: none;
 }
 
-.sidebar_content .blog_title {
-	padding: 0px;
-	margin: 1em 0px;
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+
+	.js .reveal {
+		opacity: 1;
+		transform: none;
+		transition: none;
+	}
 }
 
-.sidebar_content .blog_desc {
-	padding: 0px;
-	margin: 0px 1em;
+/* --- FORMS --- */
+
+.page-shell {
+	max-width: 52em;
+	margin: 0 auto;
+	padding: 2em 1em;
 }
 
-.sidebar .search {
-	padding: 1em;
+.form-panel {
+	padding: 1.5em 1em;
 }
 
-.sidebar .search input {
-	background: var(--input-bg);
-	border: 5px;
-	border-color: var(--surface);
-	box-shadow: none;
+.form-stack .field:last-of-type {
+	margin-bottom: 1.25em;
+}
+
+.field {
+	display: block;
+	margin: 0 0 1em;
+}
+
+.field-label {
+	display: block;
+	margin-bottom: 0.35em;
+	font-weight: 600;
+}
+
+.field-input {
+	display: block;
+	width: 100%;
+	padding: 0.55em;
+	font: inherit;
 	color: var(--input-text);
+	background: var(--input-bg);
+	border: 1px solid var(--input-focus-bg);
+	border-radius: 4px;
 }
 
-.sidebar .search input:focus {
-	background: var(--input-focus-bg);
+.field-textarea {
+	min-height: 10em;
+	resize: vertical;
 }
 
-.content {
-    /* margin: 14em 0px; */
+.field-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1em;
 }
 
-.blog_footer {
-	margin: 0px 0px;
-	padding: 1em;
-	background: var(--surface);
-	color: var(--surface-text);
+.field-row .field {
+	flex: 1 1 12em;
 }
 
-#admin_controls {
-	padding: 1em;
-	background: var(--surface);
+.field-select {
+	width: auto;
+	min-width: 12em;
 }
 
-/* --- FORM/INPUT --- */
-
-/* - BUTTON STYLES ARE FROM PURE CSS WEBSITE */
-.button-success,
-.button-error,
-.button-warning,
-.button-secondary {
-    color: white;
-    border-radius: 4px;
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+.form-error {
+	color: #b00020;
 }
 
-.button-success { /* GREEN */
-    background: rgb(28, 184, 65);
+.action-danger,
+.post_actions a.action-danger {
+	color: #c62828;
 }
 
-.button-error { /* MAROON */
-    background: rgb(202, 60, 60);
+.form-error,
+.form-hint {
+	margin: 0 0 1em;
 }
 
-.button-warning { /* ORANGE */
-    background: rgb(223, 117, 20);
+/* --- POST CONTENT (readable without a theme) ---
+   One vertical rhythm for everything the Markdown renderer can emit, so long
+   posts, pages and the editor preview all line up the same way. */
+
+.post_content {
+	overflow-wrap: break-word;
 }
 
-.button-secondary { /* CYAN */
-    background: rgb(66, 184, 221);
+.post_content > :first-child {
+	margin-top: 0;
 }
 
-.button-dark { /* DARK */
-    background: #333333;
-    color: #999999;
+.post_content > :last-child {
+	margin-bottom: 0;
 }
 
-.search_box {
-	margin-bottom: 0.25em;
+.post_content p,
+.post_content ul,
+.post_content ol,
+.post_content dl,
+.post_content blockquote,
+.post_content pre,
+.post_content table,
+.post_content figure {
+	margin: 0 0 1.2em;
 }
 
-/* --- PAGES --- */
+.post_content h1,
+.post_content h2,
+.post_content h3,
+.post_content h4,
+.post_content h5,
+.post_content h6 {
+	margin: 2em 0 0.6em;
+	font-weight: 700;
+	line-height: 1.25;
+	scroll-margin-top: 5rem;
+}
 
-.page_header {
+.post_content h1 {
+	font-size: 1.9em;
+}
 
+.post_content h2 {
+	padding-bottom: 0.35rem;
+	border-bottom: 1px solid color-mix(in srgb, var(--panel-border) 70%, transparent);
+	font-size: 1.5em;
+}
+
+.post_content h3 {
+	font-size: 1.22em;
+}
+
+.post_content h4 {
+	font-size: 1.05em;
+}
+
+.post_content h5,
+.post_content h6 {
+	color: var(--muted);
+	font-size: 0.95em;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.post_content img {
+	display: block;
+	max-width: 100%;
+	height: auto;
+	margin: 1.5rem auto;
+	border-radius: 6px;
+}
+
+.post_content figure {
+	margin: 1.5rem 0;
+}
+
+.post_content figure img {
+	margin: 0 auto;
+}
+
+.post_content figcaption {
+	margin-top: 0.6rem;
+	color: var(--muted);
+	font-size: 0.85em;
 	text-align: center;
+}
+
+.post_content ul,
+.post_content ol {
+	padding-left: 1.4em;
+}
+
+.post_content li + li {
+	margin-top: 0.35em;
+}
+
+.post_content li > ul,
+.post_content li > ol {
+	margin: 0.35em 0 0;
+}
+
+.post_content li::marker {
+	color: var(--accent);
+}
+
+.post_content a {
+	text-decoration-thickness: 1px;
+	text-underline-offset: 0.18em;
+}
+
+.post_content a:hover {
+	text-decoration-thickness: 2px;
+}
+
+.post_content strong {
 	color: var(--heading);
-	background: var(--surface);
-	padding: 0.5em;
-	margin-bottom: 1em;
-	
 }
 
-.page_content {
-	padding: 1em;
+.post_content hr {
+	height: 1px;
+	margin: 2.4rem 0;
+	border: 0;
+	background: linear-gradient(90deg, transparent, var(--panel-border), transparent);
 }
 
-.pagination {
-	text-align: center;
-}
-
-/* --- POSTS --- */
-
-#posts {
-	padding: 1em;
-}
-
-.blog_post {
-	margin-bottom: 1em;
-}
-
-.post_header h2 {
-	padding: 0em;
-	margin: 0em;
-}
-
-.post_header {
-	font-size: larger;
-}
-
-.post_title a {
-	text-decoration: none;
+.post_content blockquote {
+	margin: 1.5em 0;
+	padding: 0.8em 1.2em;
+	border-left: 3px solid var(--accent);
+	border-radius: 0 6px 6px 0;
+	background: color-mix(in srgb, var(--accent) 8%, transparent);
 	color: var(--text);
 }
 
-.post_actions, .post_actions a {
-	text-decoration: none;
-	color: var(--link-muted);
+.post_content blockquote > :last-child {
+	margin-bottom: 0;
 }
 
-.post_meta {
+.post_content code {
+	padding: 0.12em 0.4em;
+	border: 1px solid color-mix(in srgb, var(--panel-border) 70%, transparent);
+	border-radius: 4px;
+	background: var(--code-bg);
+	color: var(--code-text);
+	font-family: ui-monospace, SFMono-Regular, "Cascadia Mono", Menlo, Consolas, monospace;
+	font-size: 0.9em;
+}
+
+.post_content pre {
+	overflow-x: auto;
+	padding: 1.05em 1.2em;
+	border: 1px solid var(--panel-border);
+	border-radius: 8px;
+	background: var(--code-bg);
+	color: var(--code-text);
+	line-height: 1.6;
+}
+
+.post_content pre code {
+	display: block;
+	padding: 0;
+	border: 0;
+	background: none;
+	font-size: 0.88em;
+}
+
+.post_content table {
+	display: block;
+	width: 100%;
+	max-width: 100%;
+	overflow-x: auto;
+	border-collapse: collapse;
+	font-size: 0.95em;
+}
+
+.post_content th,
+.post_content td {
+	padding: 0.55em 0.75em;
+	border: 1px solid var(--panel-border);
+	text-align: left;
+	vertical-align: top;
+}
+
+.post_content th {
+	background: color-mix(in srgb, var(--accent) 10%, transparent);
+	color: var(--heading);
+	font-weight: 600;
+}
+
+.post_content tbody tr:nth-child(even) {
+	background: color-mix(in srgb, var(--panel) 60%, transparent);
+}
+
+/* Images written back-to-back, one per Markdown line, tile into a gallery. */
+.post-gallery {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+	gap: 0.6rem;
+	margin: 1.6rem 0;
+}
+
+.post_content .post-gallery img {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	border-radius: 8px;
+	aspect-ratio: 4 / 3;
+	object-fit: cover;
+	transition: transform 0.35s ease, filter 0.35s ease;
+}
+
+.post_content .post-gallery img:hover {
+	transform: scale(1.015);
+	filter: saturate(1.08);
+}
+
+/* Short textarea used by the footer setting. */
+.footer-input {
+	min-height: 5.5em;
+}
+
+.post-actions,
+.post_actions {
+	display: inline-flex;
+	gap: 0.6em;
+}
+
+.page-indicator {
 	color: var(--muted);
 }
 
-.post_content {
-	padding-bottom: 1em;
-	font-size: large;
-	text-align: justify;
+.page_list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
 }
 
-.post_footer {
-	padding: 0.1em;
-}
-
-.post_content a:visited {
-	color: var(--text);
-}
-.post_content pre {
-	border-radius: 4px;
-	padding: 0.5em;
-	background: var(--code-bg);
-	color: var(--code-text);
-}
-.post_content code {
-	background: var(--code-bg);
-	color: var(--code-text);
-	border-radius: 4px;
-}
-
-.view_post_header {
+.page_header {
 	color: var(--heading);
 	background: var(--surface);
-	padding: 5em 3em;
-    font-size: x-large;
-    text-align: center;
 }
 
-.view_post_content {
-	padding: 1em;
+.page_header h2 {
+	margin: 0;
 }
 
-/* --- RESPONSIVE MEDIA --- */
+/* --- ICONS ---
+   One inline SVG sprite per page. Icons inherit the text color and use the same
+   stroke weight everywhere, so they stay legible on every theme. */
 
-@media (min-width: 48em) {
-	.sidebar {
-		position: fixed;
-		top: 0;
-		bottom: 0;
-	}
-	.content {
-		margin-top: 0px;
-		margin-left: 25%;
-	}
-	
-	.blog_footer {
-		margin-left: 25%;
-	}
+.icon-sprite {
+	position: absolute;
+	width: 0;
+	height: 0;
+	overflow: hidden;
+}
+
+.icon {
+	display: inline-block;
+	width: 1em;
+	height: 1em;
+	flex: 0 0 auto;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 1.8;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	vertical-align: -0.14em;
+}
+
+.pure-button {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.42rem;
+}
+
+/* --- SIDEBAR NAV / TAGS --- */
+
+.search-field {
+	position: relative;
+	display: block;
+}
+
+.search-field > .icon {
+	position: absolute;
+	top: 50%;
+	left: 0.75rem;
+	width: 1rem;
+	height: 1rem;
+	transform: translateY(-50%);
+	color: var(--muted);
+	pointer-events: none;
+}
+
+.site-search .search_box {
+	padding-left: 2.3rem;
+}
+
+.site-nav {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.25rem;
+	margin-top: 1rem;
+}
+
+.site-nav-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45rem;
+	padding: 0.42rem 0.65rem;
+	border: 1px solid transparent;
+	border-radius: var(--radius-sm);
+	color: var(--surface-text);
+	font-size: 0.9rem;
+	text-decoration: none;
+	transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.site-nav-link:hover {
+	color: var(--heading);
+	background: var(--panel);
+	border-color: var(--panel-border);
+}
+
+.site-pages-title {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+}
+
+.site-tags {
+	margin: 1.35rem 0 0;
+	padding-top: 1.1rem;
+	border-top: 1px solid var(--panel-border);
+}
+
+.tag-cloud {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+}
+
+.tag-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.16rem 0.5rem;
+	border: 1px solid var(--panel-border);
+	border-radius: 999px;
+	background: var(--panel);
+	color: var(--surface-text);
+	font-size: 0.76rem;
+	line-height: 1.5;
+	text-decoration: none;
+	transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.tag-chip:hover {
+	color: var(--heading);
+	background: var(--panel-strong);
+	border-color: var(--accent);
+}
+
+.tag-count {
+	color: var(--muted);
+	font-size: 0.68rem;
+}
+
+/* --- POST TAGS / META --- */
+
+.post-tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+	width: 100%;
+	margin-top: 0.45rem;
+}
+
+.post_header .post-tags {
+	flex-basis: 100%;
+}
+
+.post-reading {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	font-size: 0.78rem;
+	letter-spacing: 0;
+	text-transform: none;
+}
+
+.view-post-tags {
+	position: relative;
+	justify-content: center;
+}
+
+/* --- DRAFT PREVIEW / RELATED POSTS --- */
+
+.post-preview-note {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+	margin: 0 0 1rem;
+	padding: 0.7rem 1rem;
+	border: 1px solid color-mix(in srgb, #f59e0b 46%, transparent);
+	border-radius: var(--radius-sm);
+	background: color-mix(in srgb, #f59e0b 12%, transparent);
+	color: var(--text);
+	font-size: 0.88rem;
+}
+
+.related-posts {
+	max-width: 74rem;
+	margin-top: 2rem;
+	padding-top: 1.5rem;
+	border-top: 1px solid var(--panel-border);
+}
+
+.related-title {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin: 0 0 1rem;
+	color: var(--heading);
+	font-size: 1.1rem;
+}
+
+.related-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+	gap: 0.75rem;
+}
+
+.related-card {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+	padding: 1rem 1.1rem;
+	border: 1px solid var(--panel-border);
+	border-radius: var(--radius-sm);
+	background: var(--panel);
+	text-decoration: none;
+	transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.related-card:hover {
+	background: var(--panel-strong);
+	border-color: var(--accent);
+}
+
+.related-card-title {
+	color: var(--heading);
+	font-weight: 600;
+}
+
+.related-card-meta {
+	color: var(--muted);
+	font-size: 0.8rem;
+}
+
+.tag-summary {
+	padding: 0 0.25rem 0.5rem;
+}
+
+.tag-heading {
+	margin: 0 0 0.35rem;
+	color: var(--heading);
+	font-size: clamp(1.8rem, 3vw, 2.4rem);
+	letter-spacing: -0.02em;
+}
+
+.site-footer a {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	color: var(--muted);
+}
+
+.site-footer a:hover {
+	color: var(--heading);
 }

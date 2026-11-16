@@ -1,0 +1,915 @@
+/* Shared frosted-glass system.
+   Theme files set the palette plus a few tokens, import this file, then add
+   their own flourishes. The skeleton is identical in every theme (a full-height
+   rail flush to the left edge plus one content column); only skin, type and
+   decoration change.
+
+   Design language: flat sheets of glass, hairline edges, small corner radius,
+   layered translucency over an animated aurora, no pointer effects. */
+
+:root {
+	--radius: 10px;
+	--radius-sm: 6px;
+	--rail: 17.5rem;
+	--blur: blur(20px) saturate(150%);
+	--shadow: 0 20px 48px rgba(0, 0, 0, 0.32);
+	--panel: rgba(255, 255, 255, 0.06);
+	--panel-strong: rgba(255, 255, 255, 0.1);
+	--panel-border: rgba(255, 255, 255, 0.14);
+	--hairline: rgba(255, 255, 255, 0.22);
+	--glow-a: rgba(37, 99, 235, 0.35);
+	--glow-b: rgba(168, 85, 247, 0.26);
+	--glow-c: rgba(20, 184, 166, 0.24);
+	--noise: 0.22;
+	--drift: 26s;
+	--lift: -3px;
+	--on-accent: #ffffff;
+	--text: #e7edf9;
+	--heading: #ffffff;
+	--muted: #93a2bf;
+	--surface-text: #b6c4de;
+	--link: #bcd4ff;
+	--code-bg: rgba(6, 12, 24, 0.65);
+	--code-text: #dbe6ff;
+	--input-bg: rgba(255, 255, 255, 0.06);
+	--input-text: #f2f6ff;
+	--input-focus-bg: rgba(255, 255, 255, 0.12);
+}
+
+html {
+	background: var(--page-bg);
+}	body {
+	min-height: 100vh;
+	/* The page-bg veil on top keeps the aurora a faint tint behind the glass. */
+	background:
+		linear-gradient(color-mix(in srgb, var(--page-bg) 45%, transparent), color-mix(in srgb, var(--page-bg) 45%, transparent)),
+		radial-gradient(52vmax 52vmax at 6% 0%, var(--glow-a), transparent 62%),
+		radial-gradient(46vmax 46vmax at 94% 12%, var(--glow-b), transparent 60%),
+		radial-gradient(60vmax 60vmax at 50% 108%, var(--glow-c), transparent 62%),
+		var(--page-bg);
+	background-attachment: fixed;
+	color: var(--text);
+	overflow-x: hidden;
+}
+
+/* Drifting aurora. */
+body::before {
+	content: "";
+	position: fixed;
+	inset: -22vmax;
+	z-index: 0;
+	pointer-events: none;
+	background:
+		radial-gradient(36vmax 36vmax at 28% 30%, var(--glow-a), transparent 62%),
+		radial-gradient(40vmax 40vmax at 74% 66%, var(--glow-b), transparent 64%),
+		radial-gradient(32vmax 32vmax at 50% 10%, var(--glow-c), transparent 60%);
+	filter: blur(44px);
+	opacity: 0.42;
+	animation: glass-drift var(--drift) ease-in-out infinite alternate;
+}
+
+/* Fine grain so the glass never looks flat. */
+body::after {
+	content: "";
+	position: fixed;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	opacity: var(--noise);
+	mix-blend-mode: soft-light;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@keyframes glass-drift {
+	from { transform: translate3d(-2%, -2%, 0) rotate(-2deg) scale(1); }
+	to { transform: translate3d(2%, 2%, 0) rotate(3deg) scale(1.06); }
+}
+
+/* Content sits above the background layers. */
+.site-shell,
+.dash,
+.login-shell,
+.site-footer {
+	position: relative;
+	z-index: 1;
+}
+
+/* --- SHELL: glass sheet flush to the left edge --- */
+
+.site-shell {
+	display: grid;
+	grid-template-columns: var(--rail) minmax(0, 1fr);
+	align-items: start;
+	min-height: 100vh;
+	width: 100%;
+}
+
+/* Pure's grid width classes would otherwise squeeze the rail and main. */
+.site-shell .site-sidebar,
+.site-shell .site-main {
+	width: auto;
+	float: none;
+}
+
+.site-shell .site-sidebar {
+	position: sticky;
+	top: 0;
+	align-self: start;
+	height: 100vh;
+	margin: 0;
+	padding: 2rem 1.4rem;
+	overflow-y: auto;
+	border: 0;
+	border-right: 1px solid var(--panel-border);
+	border-radius: 0 var(--radius) var(--radius) 0;
+	background:
+		linear-gradient(118deg, rgba(255, 255, 255, 0.14), transparent 42%),
+		linear-gradient(160deg, var(--panel-strong), var(--panel));
+	-webkit-backdrop-filter: var(--blur);
+	backdrop-filter: var(--blur);
+	box-shadow: var(--shadow), inset -1px 0 0 rgba(255, 255, 255, 0.16);
+}
+
+.site-brand {
+	position: relative;
+	padding-top: 0.75rem;
+	color: var(--surface-text);
+}
+
+.site-sidebar .accent_bar {
+	position: absolute;
+	inset: 0 0 auto;
+	height: 2px;
+	padding: 0;
+	background: linear-gradient(90deg, var(--accent), transparent);
+	box-shadow: 0 0 18px var(--accent);
+}
+
+.site-title {
+	margin: 0.5rem 0 0.75rem;
+	font-size: 1.45rem;
+	font-weight: 700;
+	line-height: 1.15;
+	letter-spacing: -0.01em;
+}
+
+.site-title a,
+.site-sidebar .blog_title a {
+	color: var(--heading);
+	text-decoration: none;
+}
+
+.site-description {
+	margin: 0 0 1.5rem;
+	color: var(--surface-text);
+	font-size: 0.9rem;
+	line-height: 1.55;
+}
+
+.site-search {
+	margin: 0;
+	padding: 0;
+}
+
+.site-search .search_box,
+.site-search input {
+	width: 100%;
+	padding: 0.6rem 0.8rem;
+	font: inherit;
+	color: var(--input-text);
+	background: var(--input-bg);
+	border: 1px solid var(--panel-border);
+	border-radius: var(--radius-sm);
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
+	transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.site-search .search_box::placeholder {
+	color: var(--muted);
+}
+
+.site-search .search_box:focus {
+	outline: none;
+	background: var(--input-focus-bg);
+	border-color: var(--accent);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+/* Pages, listed in the sidebar under the search box. */
+.site-pages {
+	margin: 1.35rem 0 0;
+	padding-top: 1.1rem;
+	border-top: 1px solid var(--panel-border);
+}
+
+.site-pages-title {
+	margin: 0 0 0.45rem;
+	color: var(--muted);
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+}
+
+.site-pages-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.site-pages-list a {
+	display: block;
+	padding: 0.42rem 0.65rem;
+	border: 1px solid transparent;
+	border-radius: var(--radius-sm);
+	color: var(--surface-text);
+	font-size: 0.92rem;
+	text-decoration: none;
+	transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.site-pages-list a:hover {
+	color: var(--heading);
+	background: var(--panel);
+	border-color: var(--panel-border);
+}
+
+/* --- MAIN --- */
+
+.site-main {
+	/* The page-specific rules below pull a header out of these gutters, so keep
+	   the padding and the bleed in one place. */
+	--main-pad-x: clamp(1.25rem, 3.5vw, 4rem);
+	--main-pad-y: clamp(1.5rem, 3vw, 3rem);
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	min-width: 0;
+	padding: var(--main-pad-y) var(--main-pad-x) 5rem;
+}
+
+/* Give paginated pages a full column so the pager can sit at the bottom. */
+.site-main:has(.pagination) {
+	min-height: 100vh;
+}
+
+.post-list {
+	display: grid;
+	gap: 1.15rem;
+	max-width: 78rem;
+	margin: 0;
+	padding: 0;
+}
+
+.blog_post {
+	margin: 0;
+}
+
+/* --- SHEETS OF GLASS --- */
+
+.post-card,
+.view_post_header,
+.page_header,
+.form-panel {
+	position: relative;
+	border: 1px solid var(--panel-border);
+	border-radius: var(--radius);
+	background:
+		linear-gradient(118deg, rgba(255, 255, 255, 0.16), transparent 38%, transparent 72%, rgba(255, 255, 255, 0.06)),
+		linear-gradient(160deg, var(--panel-strong), var(--panel));
+	-webkit-backdrop-filter: var(--blur);
+	backdrop-filter: var(--blur);
+	box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.post-card {
+	padding: clamp(1.4rem, 2.4vw, 2.4rem);
+	transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.js .post-card {
+	transition: opacity .6s ease, transform .35s ease, border-color .35s ease, box-shadow .35s ease;
+}
+
+.post-card:hover {
+	border-color: var(--hairline);
+	transform: translateY(var(--lift));
+	box-shadow: 0 28px 60px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.post-card::after {
+	content: "";
+	position: absolute;
+	inset: auto 0 0;
+	height: 1px;
+	background: linear-gradient(90deg, transparent, var(--hairline), transparent);
+	opacity: 0.6;
+	pointer-events: none;
+}
+
+.post_header {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.35rem 1rem;
+	margin-bottom: 0.35rem;
+}
+
+.post-title,
+.post_title {
+	margin: 0;
+	font-size: clamp(1.3rem, 2.2vw, 1.8rem);
+	font-weight: 700;
+	line-height: 1.2;
+	letter-spacing: -0.012em;
+}
+
+.post_title a {
+	color: var(--heading);
+	text-decoration: none;
+	border-bottom: 1px solid transparent;
+	transition: border-color 0.25s ease;
+}
+
+.post_title a:hover {
+	border-bottom-color: var(--accent);
+}
+
+.post-meta {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: var(--muted);
+	font-size: 0.78rem;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+}
+
+.post-meta::before {
+	content: "";
+	width: 5px;
+	height: 5px;
+	border-radius: 50%;
+	background: var(--accent);
+	box-shadow: 0 0 10px var(--accent);
+}
+
+.post_content {
+	padding: 0.75rem 0 0.9rem;
+	color: var(--text);
+	font-size: 1.02rem;
+	line-height: 1.8;
+	text-align: left;
+}
+
+.post_content a {
+	color: var(--link);
+	text-underline-offset: 0.18em;
+}
+
+.post_content h1,
+.post_content h2,
+.post_content h3,
+.post_content h4 {
+	color: var(--heading);
+	letter-spacing: -0.01em;
+}
+
+.post_content img {
+	border: 1px solid var(--panel-border);
+	border-radius: var(--radius-sm);
+}
+
+.post_footer {
+	min-height: 0;
+	padding: 0;
+}
+
+.post-actions,
+.post_actions {
+	font-size: 0.85rem;
+	color: var(--muted);
+}
+
+.post_actions a {
+	color: var(--link);
+	text-decoration: none;
+	border-bottom: 1px solid transparent;
+}
+
+.post_actions a:hover {
+	border-bottom-color: currentColor;
+}
+
+.post_actions a.action-danger {
+	color: color-mix(in srgb, #e11d48 78%, var(--text));
+}
+
+/* --- SINGLE POST --- */
+
+.post-single {
+	max-width: 78rem;
+}
+
+.view_post_header {
+	overflow: hidden;
+	padding: clamp(2rem, 5vw, 4rem) clamp(1.25rem, 4vw, 3rem);
+	text-align: center;
+	color: var(--heading);
+}
+
+.view_post_header::before {
+	content: "";
+	position: absolute;
+	inset: -70% -20% auto;
+	height: 160%;
+	pointer-events: none;
+	background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 30%, transparent), transparent);
+	filter: blur(30px);
+	animation: glass-float 16s ease-in-out infinite alternate;
+}
+
+@keyframes glass-float {
+	from { transform: translate3d(-4%, 0, 0) scale(1); }
+	to { transform: translate3d(6%, 3%, 0) scale(1.12); }
+}
+
+.view_post_header .post_title {
+	position: relative;
+	font-size: clamp(1.9rem, 3.6vw, 3rem);
+	line-height: 1.08;
+	letter-spacing: -0.02em;
+	text-wrap: balance;
+}
+
+.view_post_header .post-meta {
+	position: relative;
+	justify-content: center;
+	margin-top: 0.75rem;
+}
+
+.view-post-actions {
+	position: relative;
+	justify-content: center;
+	flex-wrap: wrap;
+	margin-top: 1.1rem;
+}
+
+.view-post-actions .pure-button {
+	padding: 0.45rem 0.9rem;
+	font-size: 0.82rem;
+}
+
+/* Static pages (not the paginated post list). */
+.page-kicker {
+	margin: 0 0 0.5rem;
+	color: var(--muted);
+	font-size: 0.72rem;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+}
+
+/* Pages are banners, not cards. The header breaks out of the content gutters
+   so it runs flush to the rail on the left and flush to the viewport on the
+   right, and the title sets full width on it. Posts keep the floating card. */
+.page-single {
+	max-width: none;
+}
+
+.page-single .view_post_header {
+	margin: calc(var(--main-pad-y) * -1) calc(var(--main-pad-x) * -1) 0;
+	padding: clamp(2.75rem, 6vw, 4.75rem) clamp(1.25rem, 3.5vw, 4rem) clamp(2.4rem, 5vw, 3.6rem);
+	border: 0;
+	border-bottom: 1px solid color-mix(in srgb, var(--accent) 42%, var(--panel-border));
+	border-radius: 0;
+	text-align: left;
+	background:
+		radial-gradient(120% 180% at 100% 0%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 62%),
+		linear-gradient(160deg, var(--panel-strong), var(--panel));
+	box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.page-single .view_post_header::before {
+	inset: -90% -10% auto;
+	height: 190%;
+}
+
+.page-single .view_post_header::after {
+	content: "";
+	position: absolute;
+	inset: auto 0 0;
+	height: 1px;
+	background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 70%, transparent) 16%, color-mix(in srgb, var(--accent) 24%, transparent) 58%, transparent);
+	pointer-events: none;
+}
+
+.page-single .page-kicker {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.6rem;
+	color: color-mix(in srgb, var(--accent) 62%, var(--heading));
+}
+
+.page-single .page-kicker::before {
+	content: "";
+	width: 2.4rem;
+	height: 2px;
+	background: linear-gradient(90deg, var(--accent), transparent);
+	box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+/* The date belongs under the title, aligned with it, not centred on the banner. */
+.page-single .view_post_header .post-meta {
+	justify-content: flex-start;
+	margin-top: 1rem;
+}
+
+.page-single .view_post_header .post_title {
+	position: relative;
+	max-width: 100%;
+	font-size: clamp(2.35rem, 5.2vw, 4.1rem);
+	line-height: 1.04;
+	letter-spacing: -0.035em;
+}
+
+.page-single .view-post-actions {
+	justify-content: flex-start;
+	margin-top: 1.6rem;
+}
+
+.page-single .post-body {
+	max-width: 74rem;
+	padding-top: clamp(1.75rem, 4vw, 2.75rem);
+}
+
+.view_post_content {
+	padding: clamp(1.25rem, 3vw, 2rem) 0 0;
+}
+
+.view_post_content .post_content {
+	max-width: 74rem;
+	font-size: 1.08rem;
+}
+
+/* --- PAGINATION / SEARCH --- */
+
+/* Pagination floats in the bottom-right corner and stays there while the
+   page scrolls, so it never wanders off-screen on long archives. */
+.pagination {
+	position: sticky;
+	bottom: 0.9rem;
+	z-index: 25;
+	width: fit-content;
+	margin: auto 0 0 auto;
+	padding: 0.4rem;
+	text-align: right;
+	border: 1px solid var(--panel-border);
+	border-radius: 999px;
+	background: color-mix(in srgb, var(--page-bg) 74%, transparent);
+	-webkit-backdrop-filter: var(--blur);
+	backdrop-filter: var(--blur);
+	box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+/* Clear the fixed admin dock on posts and pages. */
+body:has(.admin-bar) .pagination {
+	bottom: 4.9rem;
+}
+
+.page_list {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: 0.4rem;
+}
+
+.page-link {
+	display: inline-block;
+	min-width: 2.5rem;
+	padding: 0.45rem 0.85rem;
+	border: 1px solid var(--panel-border);
+	border-radius: var(--radius-sm);
+	background: var(--panel);
+	color: var(--text);
+	text-align: center;
+	text-decoration: none;
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
+	transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.page-link:hover {
+	background: var(--panel-strong);
+	border-color: var(--hairline);
+}
+
+.page-link.is-current {
+	color: var(--on-accent);
+	background: color-mix(in srgb, var(--accent) 78%, transparent);
+	border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
+.page-indicator,
+.search-heading {
+	color: var(--muted);
+}
+
+.search-heading {
+	margin: 0 0 0.5rem;
+	font-size: 0.95rem;
+	font-weight: 500;
+}
+
+.search-summary {
+	padding: 0 0.25rem;
+}
+
+/* --- BUTTONS: colored frosted glass --- */
+
+.pure-button {
+	padding: 0.55rem 1.1rem;
+	font: inherit;
+	font-size: 0.92rem;
+	font-weight: 600;
+	color: var(--text);
+	background: var(--panel);
+	border: 1px solid var(--panel-border);
+	border-radius: var(--radius-sm);
+	text-decoration: none;
+	text-shadow: none;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+	-webkit-backdrop-filter: blur(14px) saturate(150%);
+	backdrop-filter: blur(14px) saturate(150%);
+	transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.pure-button:hover,
+.pure-button:focus {
+	background: var(--panel-strong);
+	border-color: var(--hairline);
+	transform: translateY(-1px);
+}
+
+.button-success {
+	color: var(--on-accent);
+	background: color-mix(in srgb, var(--accent) 74%, transparent);
+	border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 10px 24px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+.button-success:hover,
+.button-success:focus {
+	background: color-mix(in srgb, var(--accent) 86%, transparent);
+	border-color: color-mix(in srgb, var(--accent) 70%, transparent);
+}
+
+.button-error {
+	color: #ffffff;
+	background: color-mix(in srgb, #e11d48 62%, transparent);
+	border-color: color-mix(in srgb, #e11d48 50%, transparent);
+}
+
+.button-error:hover,
+.button-error:focus {
+	background: color-mix(in srgb, #e11d48 76%, transparent);
+}
+
+.button-warning {
+	color: #201400;
+	background: color-mix(in srgb, #f59e0b 58%, transparent);
+	border-color: color-mix(in srgb, #f59e0b 46%, transparent);
+}
+
+.button-secondary {
+	color: #03181d;
+	background: color-mix(in srgb, #22d3ee 52%, transparent);
+	border-color: color-mix(in srgb, #22d3ee 42%, transparent);
+}
+
+/* --- ADMIN DOCK: hugs the bottom --- */
+
+.admin-bar {
+	position: fixed;
+	left: 50%;
+	bottom: 1.1rem;
+	z-index: 40;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 0.4rem;
+	padding: 0.45rem;
+	transform: translateX(-50%);
+	border: 1px solid var(--panel-border);
+	border-radius: var(--radius);
+	background: color-mix(in srgb, var(--page-bg) 55%, transparent);
+	-webkit-backdrop-filter: var(--blur);
+	backdrop-filter: var(--blur);
+	box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.admin-bar .pure-button {
+	padding: 0.45rem 0.95rem;
+	font-size: 0.85rem;
+}
+
+body:has(.admin-bar) {
+	padding-bottom: 5.5rem;
+}
+
+/* --- FORMS --- */
+
+.form-panel,
+.dash-panel {
+	padding: clamp(1.25rem, 2.5vw, 2rem);
+}
+
+.field-label {
+	color: var(--surface-text);
+	font-size: 0.76rem;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+}
+
+.field-input {
+	padding: 0.65rem 0.8rem;
+	color: var(--input-text);
+	background: var(--input-bg);
+	border: 1px solid var(--panel-border);
+	border-radius: var(--radius-sm);
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
+	transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.field-input:focus {
+	outline: none;
+	background: var(--input-focus-bg);
+	border-color: var(--accent);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+/* Native selects ignore the theme until they are opened, so draw the control
+   ourselves and theme both the closed box and its option list. */
+.field-select {
+	appearance: none;
+	-webkit-appearance: none;
+	padding-right: 2.35rem;
+	cursor: pointer;
+	background-color: var(--input-bg);
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5l5-5' fill='none' stroke='%236b7c98' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 0.8rem center;
+	background-size: 0.75rem;
+}
+
+.field-select option {
+	color: var(--text);
+	background-color: var(--page-bg);
+}
+
+.form-error {
+	padding: 0.65rem 0.9rem;
+	border: 1px solid color-mix(in srgb, #e11d48 55%, transparent);
+	border-radius: var(--radius-sm);
+	color: var(--text);
+	background: color-mix(in srgb, #e11d48 16%, transparent);
+}
+
+/* --- FOOTER --- */
+
+.site-footer {
+	margin: 0;
+	padding: 2rem 1.5rem 2.5rem;
+	border-top: 1px solid var(--panel-border);
+	background: color-mix(in srgb, var(--panel) 70%, transparent);
+	color: var(--muted);
+	text-align: center;
+	font-size: 0.82rem;
+	letter-spacing: 0.05em;
+}
+
+.site-footer p {
+	margin: 0;
+}
+
+/* --- LAYOUT: ONE SKELETON FOR EVERY THEME ---
+   Every theme keeps the same structure: a full-height glass rail hugging the
+   left edge, then a single content column. Themes only change skin, type and
+   decoration, so navigation never moves or disappears between themes. */
+
+/* --- RESPONSIVE ---
+   Below tablet the rail folds into a top sheet, still present and identical
+   for every theme. */
+
+@media (max-width: 62em) {
+	.site-shell {
+		display: block;
+		min-height: 0;
+	}
+
+	.site-shell .site-sidebar {
+		position: relative;
+		top: auto;
+		height: auto;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 1rem 2rem;
+		padding: 1.1rem 1.25rem;
+		border: 0;
+		border-bottom: 1px solid var(--panel-border);
+		border-radius: 0 0 var(--radius) var(--radius);
+		overflow: visible;
+	}
+
+	.site-brand {
+		flex: 1 1 14rem;
+		padding-top: 0;
+		text-align: left;
+	}
+
+	.site-title {
+		margin: 0 0 0.25rem;
+	}
+
+	.site-description {
+		margin-bottom: 0;
+	}
+
+	.site-search {
+		flex: 0 1 16rem;
+	}
+
+	.site-main {
+		--main-pad-x: 1.25rem;
+		--main-pad-y: 1.75rem;
+		max-width: none;
+		padding: var(--main-pad-y) var(--main-pad-x) 4rem;
+	}
+}
+
+@media (max-width: 34em) {
+	.site-sidebar {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.site-search {
+		flex: 1 1 auto;
+	}
+
+	.admin-bar {
+		left: 0.75rem;
+		right: 0.75rem;
+		bottom: 0.75rem;
+		transform: none;
+	}
+
+	.pagination {
+		bottom: 0.75rem;
+	}
+
+	body:has(.admin-bar) .pagination {
+		bottom: 4.6rem;
+	}
+}
+
+/* Readable without backdrop-filter support. */
+@supports not ((-webkit-backdrop-filter: blur(2px)) or (backdrop-filter: blur(2px))) {
+	body {
+		background: var(--page-bg);
+	}
+
+	body::before,
+	body::after {
+		display: none;
+	}
+
+	.site-sidebar,
+	.post-card,
+	.view_post_header,
+	.form-panel,
+	.dash-panel,
+	.admin-bar {
+		background: var(--page-bg);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	body::before,
+	.view_post_header::before {
+		animation: none;
+	}
+
+	.post-card:hover,
+	.pure-button:hover,
+	.page-link:hover {
+		transform: none;
+	}
+}
