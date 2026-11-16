@@ -166,6 +166,12 @@ body::after {
 	line-height: 1.55;
 }
 
+/* The description is Markdown-rendered, so its paragraphs live inside this
+   wrapper; keep their UA margins from doubling the wrapper's spacing. */
+.site-description p {
+	margin: 0;
+}
+
 .site-search {
 	margin: 0;
 	padding: 0;
