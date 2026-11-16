@@ -1,0 +1,113 @@
+@import url("/themes/_glass.css");
+
+/* Noir: monochrome editorial. Flush-left rail, oversized serif type, flat
+   glass sheets with no corner radius. */
+:root {
+	--page-bg: #0a0a0a;
+	--glow-a: rgba(255, 255, 255, 0.1);
+	--glow-b: rgba(160, 160, 160, 0.08);
+	--glow-c: rgba(255, 255, 255, 0.05);
+	--panel: rgba(255, 255, 255, 0.035);
+	--panel-strong: rgba(255, 255, 255, 0.06);
+	--panel-border: rgba(255, 255, 255, 0.16);
+	--hairline: rgba(255, 255, 255, 0.34);
+	--shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+	--text: #ececec;
+	--heading: #ffffff;
+	--muted: #9a9a9a;
+	--surface-text: #c9c9c9;
+	--link: #ffffff;
+	--code-bg: rgba(22, 22, 22, 0.92);
+	--code-text: #eaeaea;
+	--input-bg: rgba(255, 255, 255, 0.05);
+	--input-text: #ffffff;
+	--input-focus-bg: rgba(255, 255, 255, 0.1);
+	--noise: 0.2;
+	--radius: 0px;
+	--lift: -1px;
+}
+
+.theme-noir .site-title,
+.theme-noir .post_title,
+.theme-noir .view_post_header .post_title,
+.theme-noir .dash-title {
+	font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+	font-weight: 600;
+}
+
+.theme-noir .site-shell .site-sidebar {
+	padding: 1.5rem clamp(1.25rem, 4vw, 3rem);
+}
+
+.theme-noir .site-title {
+	font-size: clamp(1.9rem, 4vw, 3rem);
+	letter-spacing: -0.03em;
+}
+
+.theme-noir .post_title {
+	font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+}
+
+.theme-noir .post-meta,
+.theme-noir .page-indicator,
+.theme-noir .site-description {
+	text-transform: uppercase;
+	letter-spacing: 0.16em;
+	font-size: 0.72rem;
+}
+
+.theme-noir .post-card .post_content {
+	font-size: 1rem;
+}
+
+.theme-noir .post-list {
+	gap: 0;
+	border-top: 1px solid var(--panel-border);
+}
+
+.theme-noir .post-card {
+	border-radius: 0;
+	border-left: 0;
+	border-right: 0;
+	box-shadow: none;
+}
+
+.theme-noir .post-card:hover {
+	transform: none;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.theme-noir .view_post_header {
+	border-radius: 0;
+	border-left: 0;
+	border-right: 0;
+}
+
+/* Pages: an editorial masthead, flat against the page with only a rule. */
+.theme-noir .page-single .view_post_header {
+	box-shadow: none;
+	background: var(--page-bg);
+	border-bottom-color: var(--panel-border);
+}
+
+/* Keep the monochrome theme monochrome: no accent wash on the masthead. */
+.theme-noir .page-single .view_post_header::before {
+	background: radial-gradient(closest-side, rgba(255, 255, 255, 0.14), transparent);
+}
+
+.theme-noir .page-single .view_post_header::after {
+	background: linear-gradient(90deg, transparent, var(--hairline) 16%, rgba(255, 255, 255, 0.16) 58%, transparent);
+}
+
+.theme-noir .page-single .page-kicker {
+	color: var(--muted);
+}
+
+.theme-noir .page-single .page-kicker::before {
+	background: var(--heading);
+	box-shadow: none;
+}
+
+.theme-noir .admin-bar {
+	border-radius: 0;
+}
