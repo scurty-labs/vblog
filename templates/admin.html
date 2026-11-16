@@ -1,33 +1,188 @@
 @include 'header'
 
-@if !ctx.is_admin
+@if ctx.is_admin
+<div class="dash">
+@include 'admin_nav'
+<main class="dash-main">
 
-<div class="pure-g">
+	<header class="dash-topbar">
+		<div class="dash-heading">
+			<p class="dash-eyebrow">Overview</p>
+			<h1 class="dash-title">Dashboard</h1>
+			<p class="dash-subtitle">A quick look at @ctx.settings.blog_title.</p>
+		</div>
+		<div class="dash-actions">
+			<a class="pure-button" href="/newpage"><svg class="icon" aria-hidden="true"><use href="#i-file"></use></svg>New page</a>
+			<a class="pure-button button-success" href="/newpost"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>New post</a>
+		</div>
+	</header>
 
-	<div class="pure-u-1">
-	<div class="page_header"><h2>Admin Login</h2></div>
+	<section class="stat-grid" aria-label="Blog statistics">
+		<article class="stat-card">
+			<span class="stat-label">Published</span>
+			<span class="stat-value">@ctx.posts_count</span>
+			<span class="stat-note">live posts</span>
+		</article>
+		<article class="stat-card">
+			<span class="stat-label">Drafts</span>
+			<span class="stat-value">@ctx.draft_count</span>
+			<span class="stat-note"><a href="/admin?status=draft">Work in progress</a></span>
+		</article>
+		<article class="stat-card">
+			<span class="stat-label">Scheduled</span>
+			<span class="stat-value">@ctx.scheduled_count</span>
+			<span class="stat-note">publishing later</span>
+		</article>
+		<article class="stat-card">
+			<span class="stat-label">Pages</span>
+			<span class="stat-value">@ctx.page_count</span>
+			<span class="stat-note"><a href="/newpage">Standalone pages</a></span>
+		</article>
+		<article class="stat-card">
+			<span class="stat-label">Theme</span>
+			<span class="stat-value stat-value-text">@ctx.theme_label(ctx.settings.theme)</span>
+			<span class="stat-note"><a href="/settings">Change theme</a></span>
+		</article>
+	</section>
+
+	<div class="dash-grid">
+
+		<section class="dash-panel dash-posts">
+			<header class="dash-panel-head">
+				<h2>Your posts</h2>
+				<a class="dash-link" href="/newpost"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg> New post</a>
+			</header>
+
+			<nav class="dash-filters" aria-label="Filter posts">
+				<a class="@{ ctx.filter_class('all') }" href="/admin">All</a>
+				<a class="@{ ctx.filter_class('published') }" href="/admin?status=published">Published <span>@ctx.posts_count</span></a>
+				<a class="@{ ctx.filter_class('draft') }" href="/admin?status=draft">Drafts <span>@ctx.draft_count</span></a>
+				<a class="@{ ctx.filter_class('scheduled') }" href="/admin?status=scheduled">Scheduled <span>@ctx.scheduled_count</span></a>
+			</nav>
+
+			@if ctx.recent_posts.len > 0
+			<table class="dash-table">
+				<thead>
+					<tr>
+						<th scope="col">Title</th>
+						<th scope="col">Status</th>
+						<th scope="col">Date</th>
+						<th scope="col" class="dash-actions-col">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+@for post in ctx.recent_posts
+					<tr>
+						<td>
+							<a class="post-link" href="/view/post/@post.id">@post.title</a>
+							@if post.tag_list().len > 0
+							<span class="row-tags">@post.tags</span>
+							@end
+						</td>
+						<td><span class="status-pill status-${post.status_class()}">@post.status_label()</span></td>
+						<td class="dash-date">@post.format_date()</td>
+						<td class="dash-row-actions">
+							<a href="/view/post/@post.id" title="View post" aria-label="View post"><svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg></a>
+							<a href="/edit/post/@post.id" title="Edit post" aria-label="Edit post"><svg class="icon" aria-hidden="true"><use href="#i-edit"></use></svg></a>
+							@if post.is_draft() || post.is_scheduled()
+							<a href="/publish/post/@post.id" title="Publish now" aria-label="Publish now"><svg class="icon" aria-hidden="true"><use href="#i-send"></use></svg></a>
+							@else
+							<a href="/unpublish/post/@post.id" title="Move to drafts" aria-label="Move to drafts"><svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg></a>
+							@end
+							<a href="/duplicate/post/@post.id" title="Duplicate post" aria-label="Duplicate post"><svg class="icon" aria-hidden="true"><use href="#i-copy"></use></svg></a>
+							<a class="action-danger" href="/delete/post/@post.id" title="Delete post" aria-label="Delete post" onclick="return confirm('Delete this post?')"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
+						</td>
+					</tr>
+@end
+				</tbody>
+			</table>
+			@else
+			<p class="dash-empty">Nothing here yet. <a href="/newpost">Write a post</a>.</p>
+			@end
+		</section>
+
+		<section class="dash-panel">
+			<header class="dash-panel-head">
+				<h2>Settings</h2>
+				<a class="dash-link" href="/settings"><svg class="icon" aria-hidden="true"><use href="#i-sliders"></use></svg> Edit</a>
+			</header>
+			<dl class="dash-list">
+				<dt>Title</dt>
+				<dd>@ctx.settings.blog_title</dd>
+				<dt>Description</dt>
+				<dd>@{ ctx.as_html(ctx.settings.blog_description) }</dd>
+				<dt>Per page</dt>
+				<dd>@ctx.settings.posts_per_page</dd>
+				<dt>Feed</dt>
+				<dd><a href="/rss.xml">/rss.xml</a></dd>
+				<dt>Sitemap</dt>
+				<dd><a href="/sitemap.xml">/sitemap.xml</a></dd>
+			</dl>
+			<a class="pure-button" href="/settings"><svg class="icon" aria-hidden="true"><use href="#i-sliders"></use></svg>Open settings</a>
+		</section>
+
 	</div>
-	
-	<div class="pure-u-1 pure-u-md-1-3"></div>
-	<div class="page_content pure-u-1 pure-u-md-1-3">
+
+	<section class="dash-panel dash-pages" aria-label="Pages">
+		<header class="dash-panel-head">
+			<h2>Pages</h2>
+			<a class="dash-link" href="/newpage"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg> New page</a>
+		</header>
+		@if ctx.pages.len > 0
+		<table class="dash-table">
+			<thead>
+				<tr>
+					<th scope="col">Title</th>
+					<th scope="col" class="dash-actions-col">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+@for site_page in ctx.pages
+				<tr>
+					<td><a class="post-link" href="/pages/@site_page.id">@site_page.title</a></td>
+					<td class="dash-row-actions">
+						<a href="/pages/@site_page.id" title="View page" aria-label="View page"><svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg></a>
+						<a href="/edit/page/@site_page.id" title="Edit page" aria-label="Edit page"><svg class="icon" aria-hidden="true"><use href="#i-edit"></use></svg></a>
+						<a class="action-danger" href="/delete/page/@site_page.id" title="Delete page" aria-label="Delete page" onclick="return confirm('Delete this page?')"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
+					</td>
+				</tr>
+@end
+			</tbody>
+		</table>
+		@else
+		<p class="dash-empty">No pages yet. <a href="/newpage">Create your first page</a>.</p>
+		@end
+	</section>
+
+</main>
+</div>
+
+@else
+
+<div class="login-shell">
+	<div class="login-card">
+		<p class="dash-eyebrow">Admin</p>
+		<h1 class="dash-title">Sign in</h1>
+		<p class="dash-subtitle">Log in to manage @ctx.settings.blog_title.</p>
+
 		@if invalid
-		<p style="color: red;">Invalid Username and/or Password...</p>
+		<p class="form-error">Invalid username and/or password.</p>
 		@end
 
-		<form class="pure-form" method="post" action="auth_login">
-
-			<input type="text" name="username" placeholder="Username">
-			<input type="password" name="password" placeholder="Password"><br/><br/>
-			<button class="button-success pure-button" type="submit" >Sign In</button>
-
+		<form class="pure-form form-stack" method="post" action="/auth_login">
+			<label class="field">
+				<span class="field-label">Username</span>
+				<input class="field-input" type="text" name="username" placeholder="Username" autocomplete="username">
+			</label>
+			<label class="field">
+				<span class="field-label">Password</span>
+				<input class="field-input" type="password" name="password" placeholder="Password" autocomplete="current-password">
+			</label>
+			<button class="button-success pure-button" type="submit"><svg class="icon" aria-hidden="true"><use href="#i-logout"></use></svg>Sign in</button>
 		</form>
-	
 	</div>
-	<div class="pure-u-1 pure-u-md-1-3"></div>
-
 </div>
 
 @end
 
-</body>
-</html>
+@include 'footer'

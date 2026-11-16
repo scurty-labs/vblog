@@ -1,30 +1,68 @@
 @include 'header'
 
-@if ctx.is_admin
+<div class="dash">
+@include 'admin_nav'
+<main class="dash-main">
 
-	<div class="pure-g">
+	<header class="dash-topbar">
+		<div class="dash-heading">
+			<p class="dash-eyebrow">Admin</p>
+			<h1 class="dash-title">Edit post</h1>
+			<p class="dash-subtitle">Update the title or body, then save.</p>
+		</div>
+		<div class="dash-actions">
+			<a class="pure-button" href="/admin"><svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>Dashboard</a>
+		</div>
+	</header>
 
-	<div class="pure-u-1">
-	<div class="page_header"><h2>Edit Post</h2></div>
-	</div>
-	
-	<div class="pure-u-1 pure-u-md-1-4"></div>
-	<div class="page_content pure-u-1 pure-u-md-1-2">
-		@if invalid
-		<p>Fields cannot be empty.</p>
-		@end
-		<form class="pure-form" method="post" action="/save/post/@post.id">
-			<input class="pure-input-rounded" style="width: 100%;" type="text" name="post_title" value="@post.title"><br/><br/>
-			<textarea style="width: 100%; max-width: 100%; min-width: 100%;" name="post_body">@post.body</textarea><br/>
-			<br/>
-			<button class="button-success pure-button" type="submit" >Save</button>
-		</form>
-	
-	</div>
-	<div class="pure-u-1 pure-u-md-1-4"></div>
+	@if invalid
+	<p class="form-error">A title and a body are required.</p>
+	@end
+
+	<form class="dash-panel pure-form editor-form" method="post" action="/save/post/@post.id">
+		<div class="field editor-title-field">
+			<label class="field-label" for="post_title">Title</label>
+			<input class="field-input editor-title-input" id="post_title" type="text" name="post_title" value="@post.title" autofocus>
+		</div>
+		<div class="field">
+			<label class="field-label" for="post_tags">Tags <span class="editor-hint">comma separated, e.g. notes, v-lang</span></label>
+			<input class="field-input" id="post_tags" type="text" name="post_tags" value="@post.tags" placeholder="notes, v-lang, tutorials">
+		</div>
+		<div class="field editor-body-field">
+			<span class="field-label">Body <span class="editor-hint">Markdown &middot; preview on the right</span></span>
+			<textarea class="field-input field-textarea" name="post_body" data-markdown>@post.body</textarea>
+		</div>
+		<div class="field-row editor-meta-row">
+			<label class="field">
+				<span class="field-label">Status</span>
+				@if post.is_draft()
+				<select class="field-input field-select" name="post_status">
+					<option value="draft" selected>Draft</option>
+					<option value="published">Published</option>
+				</select>
+				@else
+				<select class="field-input field-select" name="post_status">
+					<option value="published" selected>Published</option>
+					<option value="draft">Draft</option>
+				</select>
+				@end
+			</label>
+			<label class="field">
+				<span class="field-label">Publish at <span class="editor-hint">optional, future dates schedule it</span></span>
+				<input class="field-input" type="datetime-local" name="publish_at" value="@post.publish_at_input()">
+			</label>
+		</div>
+		<footer class="editor-actions">
+			<span class="editor-note">Preview toggles from the toolbar &middot; Ctrl/&#8984; + S saves.</span>
+			<div class="editor-buttons">
+				<a class="pure-button" href="/duplicate/post/@post.id"><svg class="icon" aria-hidden="true"><use href="#i-copy"></use></svg>Duplicate</a>
+				<a class="pure-button" href="/promote/post/@post.id"><svg class="icon" aria-hidden="true"><use href="#i-file"></use></svg>Promote to page</a>
+				<button class="button-success pure-button" type="submit"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Save changes</button>
+			</div>
+		</footer>
+	</form>
+
+</main>
 </div>
 
-@end
-
-</body>
-</html>
+@include 'footer'

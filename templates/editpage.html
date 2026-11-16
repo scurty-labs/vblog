@@ -1,0 +1,43 @@
+@include 'header'
+
+<div class="dash">
+@include 'admin_nav'
+<main class="dash-main">
+
+	<header class="dash-topbar">
+		<div class="dash-heading">
+			<p class="dash-eyebrow">Admin</p>
+			<h1 class="dash-title">Edit page</h1>
+			<p class="dash-subtitle">Update the title or body, then save.</p>
+		</div>
+		<div class="dash-actions">
+			<a class="pure-button" href="/admin"><svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>Dashboard</a>
+		</div>
+	</header>
+
+	@if invalid
+	<p class="form-error">A title and a body are required.</p>
+	@end
+
+	<form class="dash-panel pure-form editor-form" method="post" action="/save/page/@page_item.id">
+		<div class="field editor-title-field">
+			<label class="field-label" for="page_title">Title</label>
+			<input class="field-input editor-title-input" id="page_title" type="text" name="post_title" value="@page_item.title" autofocus>
+		</div>
+		<div class="field editor-body-field">
+			<span class="field-label">Body <span class="editor-hint">Markdown &middot; preview on the right</span></span>
+			<textarea class="field-input field-textarea" name="post_body" data-markdown>@page_item.body</textarea>
+		</div>
+		<footer class="editor-actions">
+			<span class="editor-note">Preview toggles from the toolbar &middot; Ctrl/&#8984; + S saves.</span>
+			<div class="editor-buttons">
+				<a class="pure-button" href="/pages/@page_item.id"><svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg>View page</a>
+				<button class="button-success pure-button" type="submit"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Save page</button>
+			</div>
+		</footer>
+	</form>
+
+</main>
+</div>
+
+@include 'footer'

@@ -1,0 +1,179 @@
+@include 'header'
+
+<div class="dash">
+@include 'admin_nav'
+<main class="dash-main">
+
+	<header class="dash-topbar">
+		<div class="dash-heading">
+			<p class="dash-eyebrow">Library</p>
+			<h1 class="dash-title">Media</h1>
+			<p class="dash-subtitle">Files live in <code>media/</code> and are served from <code>/media/</code>.</p>
+		</div>
+		<div class="dash-actions">
+			<a class="pure-button" href="/admin"><svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>Dashboard</a>
+		</div>
+	</header>
+
+	@if ctx.media_error.len > 0
+	<p class="form-error">Nothing was uploaded. Files must be 32 MB or smaller and not a web page or executable.</p>
+	@end
+	@if ctx.media_uploaded.len > 0 && ctx.media_uploaded != '0'
+	<p class="media-note"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Uploaded @ctx.media_uploaded file(s) to the library.</p>
+	@end
+	@if ctx.media_skipped.len > 0 && ctx.media_skipped != '0'
+	<p class="media-note is-warn">@ctx.media_skipped file(s) were skipped: too large, empty, or a blocked type.</p>
+	@end
+
+	<section class="stat-grid" aria-label="Media statistics">
+		<article class="stat-card">
+			<span class="stat-label">Files</span>
+			<span class="stat-value">@ctx.media_count</span>
+			<span class="stat-note">in the library</span>
+		</article>
+		<article class="stat-card">
+			<span class="stat-label">Images</span>
+			<span class="stat-value">@ctx.media_images</span>
+			<span class="stat-note">ready to embed</span>
+		</article>
+		<article class="stat-card">
+			<span class="stat-label">Storage</span>
+			<span class="stat-value stat-value-text">@ctx.media_size_label()</span>
+			<span class="stat-note">total on disk</span>
+		</article>
+	</section>
+
+	<form class="dash-panel media-upload pure-form" method="post" action="/upload/media" enctype="multipart/form-data">
+		<div class="media-drop" id="media-drop">
+			<svg class="media-drop-icon" aria-hidden="true"><use href="#i-upload"></use></svg>
+			<p class="media-drop-title">Drop files here or <label class="media-browse" for="media_files">browse</label></p>
+			<p class="media-drop-hint">Up to 32 MB each &middot; images, video, audio, PDFs, archives and text.</p>
+			<input class="media-input" id="media_files" type="file" name="media_files" multiple>
+			<p class="media-selection" id="media-selection" hidden></p>
+		</div>
+		<button class="button-success pure-button" type="submit" id="media-upload-button">
+			<svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg><span id="media-upload-label">Upload</span>
+		</button>
+	</form>
+
+	<nav class="dash-filters" aria-label="Filter media by type">
+		<a class="@{ ctx.media_filter_class('all') }" href="@ctx.media_href('all')">All <span>@ctx.media_count</span></a>
+		<a class="@{ ctx.media_filter_class('image') }" href="@ctx.media_href('image')">Images</a>
+		<a class="@{ ctx.media_filter_class('video') }" href="@ctx.media_href('video')">Video</a>
+		<a class="@{ ctx.media_filter_class('audio') }" href="@ctx.media_href('audio')">Audio</a>
+		<a class="@{ ctx.media_filter_class('document') }" href="@ctx.media_href('document')">Documents</a>
+		<a class="@{ ctx.media_filter_class('other') }" href="@ctx.media_href('other')">Other</a>
+	</nav>
+
+	<form class="media-toolbar pure-form" method="get" action="/media">
+		<input type="hidden" name="type" value="@ctx.media_kind">
+		<label class="search-field media-search">
+			<svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg>
+			<input class="field-input" type="search" name="q" value="@ctx.media_query" placeholder="Search by title, alt text or file name" aria-label="Search media">
+		</label>
+		<label class="media-sort">
+			<span class="field-label">Sort by</span>
+			<select class="field-input field-select" name="sort">
+				<option value="newest"@{ ctx.media_sort_selected('newest') }>Newest first</option>
+				<option value="oldest"@{ ctx.media_sort_selected('oldest') }>Oldest first</option>
+				<option value="name"@{ ctx.media_sort_selected('name') }>Name</option>
+				<option value="size"@{ ctx.media_sort_selected('size') }>Largest first</option>
+			</select>
+		</label>
+		<button class="pure-button" type="submit"><svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg>Apply</button>
+	</form>
+
+	@if ctx.media_items.len > 0
+	<section class="media-grid" aria-label="Media library">
+@for item in ctx.media_items
+		<article class="media-card">
+			<a class="media-thumb" href="@item.url()" target="_blank" rel="noopener" title="Open @item.file_name">
+				@if item.is_image()
+				<img src="@item.url()" alt="@item.alt_text()" loading="lazy" data-preview="@item.url()" data-preview-alt="@item.alt_text()">
+				@else if item.kind() == 'video'
+				<video class="media-thumb-video" src="@item.url()" preload="metadata" muted playsinline></video>
+				<span class="media-badge">@item.extension()</span>
+				@else
+				<span class="media-file">
+					<span class="media-file-ext">@item.extension()</span>
+					<span class="media-file-kind">@item.kind_label()</span>
+				</span>
+				@end
+			</a>
+			<div class="media-card-body">
+				<span class="media-card-title" title="@item.file_name">@item.display_title()</span>
+				<span class="media-card-meta">@item.kind_label() &middot; @item.size_label() &middot; @item.date_label()</span>
+			</div>
+			<div class="media-card-actions">
+				<button class="media-icon-button" type="button" data-copy="@item.url()" title="Copy link" aria-label="Copy link to @item.file_name"><svg class="icon" aria-hidden="true"><use href="#i-link"></use></svg></button>
+				<a class="media-icon-button" href="@item.url()" download title="Download" aria-label="Download @item.file_name"><svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg></a>
+				<button class="media-icon-button" type="button" data-dialog="media-item-@item.id" title="Edit details" aria-label="Edit details for @item.file_name"><svg class="icon" aria-hidden="true"><use href="#i-edit"></use></svg></button>
+				<a class="media-icon-button action-danger" href="/media/delete/@item.id" title="Delete" aria-label="Delete @item.file_name" onclick="return confirm('Delete @item.file_name?')"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
+			</div>
+		</article>
+@end
+	</section>
+	@else
+	<section class="dash-panel media-empty">
+		<svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg>
+		@if ctx.media_query.len > 0 || ctx.media_kind != 'all'
+		<h2>No files match this filter</h2>
+		<p>Try a different search, or <a href="/media">show everything</a>.</p>
+		@else
+		<h2>Your library is empty</h2>
+		<p>Upload your first file above. Everything lives in <code>media/</code> and is served from <code>/media/</code>.</p>
+		@end
+	</section>
+	@end
+
+	<div class="media-lightbox" id="media-lightbox" hidden>
+		<button class="media-lightbox-close" type="button" data-lightbox-close aria-label="Close preview"><svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg></button>
+		<img id="media-lightbox-image" src="" alt="">
+	</div>
+
+@for item in ctx.media_items
+	<dialog class="media-dialog" id="media-item-@item.id">
+		<form class="pure-form form-stack" method="post" action="/media/save/@item.id">
+			<header class="media-dialog-head">
+				<div>
+					<p class="dash-eyebrow">File details</p>
+					<h2 class="media-dialog-title">@item.file_name</h2>
+				</div>
+				<button class="media-icon-button" type="button" data-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg></button>
+			</header>
+			@if item.is_image()
+			<div class="media-dialog-preview"><img src="@item.url()" alt="@item.alt_text()"></div>
+			@end
+			<dl class="media-details">
+				<dt>Type</dt>
+				<dd>@item.mime</dd>
+				<dt>Size</dt>
+				<dd>@item.size_label()</dd>
+				<dt>Added</dt>
+				<dd>@item.date_label()</dd>
+				<dt>URL</dt>
+				<dd><code>@item.url()</code></dd>
+			</dl>
+			<label class="field">
+				<span class="field-label">Title</span>
+				<input class="field-input" type="text" name="media_title" value="@item.title" placeholder="Untitled">
+			</label>
+			<label class="field">
+				<span class="field-label">Alt text</span>
+				<input class="field-input" type="text" name="media_alt" value="@item.alt" placeholder="Describe the image for screen readers">
+			</label>
+			<footer class="media-dialog-actions">
+				<a class="pure-button" href="@item.url()" target="_blank" rel="noopener"><svg class="icon" aria-hidden="true"><use href="#i-external"></use></svg>Open</a>
+				<a class="pure-button" href="@item.url()" download><svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg>Download</a>
+				<button class="button-success pure-button" type="submit"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Save details</button>
+			</footer>
+		</form>
+	</dialog>
+@end
+
+	<div class="media-toast" id="media-toast" role="status" aria-live="polite" hidden></div>
+
+</main>
+</div>
+
+@include 'footer'
