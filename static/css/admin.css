@@ -106,6 +106,34 @@
 	border: 0;
 }
 
+/* The dashboard menu collapses behind a Menu button on narrow screens. The
+   button only appears when JS runs, so without it the menu stays visible. */
+.dash-menu-toggle {
+	display: none;
+	align-items: center;
+	gap: 0.45rem;
+	padding: 0.45rem 0.65rem;
+	border: 1px solid transparent;
+	border-radius: var(--radius-sm);
+	background: none;
+	color: var(--text);
+	font: inherit;
+	font-size: 0.93rem;
+	cursor: pointer;
+	transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.dash-menu-toggle:hover {
+	background: var(--panel-strong);
+	border-color: var(--panel-border);
+}
+
+.dash-menu-toggle .icon {
+	width: 1rem;
+	height: 1rem;
+	color: var(--muted);
+}
+
 .dash-main {
 	min-width: 0;
 	padding: 2rem clamp(1.25rem, 3vw, 3rem) 4rem;
@@ -504,6 +532,15 @@
 	.dash-foot {
 		order: 2;
 		margin-left: auto;
+	}
+
+	.js .dash-menu-toggle {
+		display: inline-flex;
+		order: 1;
+	}
+
+	.js .dash-nav:not(.is-open) .dash-menu {
+		display: none;
 	}
 
 	.dash-menu {

@@ -238,6 +238,36 @@ body::after {
 	border-color: var(--panel-border);
 }
 
+/* Collapsible navigation: on tablets and phones the rail folds into a top
+   sheet and its menus hide behind a Menu button. The button only appears
+   when JS runs, so without it the menus stay fully visible. */
+.site-menu-toggle {
+	display: none;
+	align-items: center;
+	gap: 0.45rem;
+	padding: 0.45rem 0.8rem;
+	border: 1px solid var(--panel-border);
+	border-radius: var(--radius-sm);
+	background: var(--panel);
+	color: var(--surface-text);
+	font: inherit;
+	font-size: 0.85rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.site-menu-toggle:hover {
+	color: var(--heading);
+	background: var(--panel-strong);
+	border-color: var(--hairline);
+}
+
+.site-menu-toggle .icon {
+	width: 1rem;
+	height: 1rem;
+}
+
 /* --- MAIN --- */
 
 .site-main {
@@ -757,6 +787,12 @@ body:has(.admin-bar) .pagination {
 	font-size: 0.85rem;
 }
 
+/* The admin dock never appears without JS interaction hidden: its toggle only
+   shows on phones, where the six buttons collapse behind an Admin button. */
+.admin-bar-toggle {
+	display: none;
+}
+
 body:has(.admin-bar) {
 	padding-bottom: 5.5rem;
 }
@@ -883,7 +919,41 @@ body:has(.admin-bar) {
 	}
 
 	.site-search {
+		order: 4;
 		flex: 0 1 16rem;
+	}
+
+	.js .site-menu-toggle {
+		display: inline-flex;
+		order: 2;
+		flex: 0 0 auto;
+	}
+
+	.js .site-brand {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.6rem 1rem;
+	}
+
+	.js .site-brand .site-title {
+		order: 1;
+		flex: 1 1 auto;
+		margin: 0;
+	}
+
+	.js .site-brand .site-description {
+		order: 3;
+		flex: 1 1 100%;
+	}
+
+	.js .site-menus {
+		order: 5;
+		flex: 1 1 100%;
+	}
+
+	.js .site-brand:not(.is-open) .site-menus {
+		display: none;
 	}
 
 	.site-main {
@@ -909,6 +979,19 @@ body:has(.admin-bar) {
 		right: 0.75rem;
 		bottom: 0.75rem;
 		transform: none;
+	}
+
+	.js .admin-bar {
+		justify-content: flex-start;
+	}
+
+	.js .admin-bar-toggle {
+		display: inline-flex;
+		flex: 0 0 auto;
+	}
+
+	.js .admin-bar:not(.is-open) > .pure-button:not(.admin-bar-toggle) {
+		display: none;
 	}
 
 	.pagination {

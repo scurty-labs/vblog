@@ -1,0 +1,52 @@
+<aside class="site-sidebar sidebar">
+<div class="site-brand sidebar_content">
+
+<div class="accent_bar"></div>
+<h1 class="site-title blog_title"><a href="/">@ctx.settings.blog_title</a></h1>
+<p class="site-description blog_desc">@{ ctx.as_html(ctx.settings.blog_description) }</p>
+
+<button class="site-menu-toggle" type="button" aria-expanded="false">
+	<svg class="icon" aria-hidden="true"><use href="#i-menu"></use></svg><span>Menu</span>
+</button>
+
+<form class="site-search search pure-form" method="post" action="/searchresults" role="search">
+	<label class="search-field">
+		<svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg>
+		<input class="search_box pure-input-rounded" type="text" name="search" placeholder="Search..." value="${ctx.search_query}" aria-label="Search posts">
+	</label>
+</form>
+
+<div class="site-menus" id="site-menus">
+<nav class="site-nav" aria-label="Blog">
+	<a class="site-nav-link" href="/"><svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg><span>Home</span></a>
+	<a class="site-nav-link" href="/rss.xml"><svg class="icon" aria-hidden="true"><use href="#i-rss"></use></svg><span>RSS feed</span></a>
+	@if ctx.is_admin
+	<a class="site-nav-link" href="/admin"><svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg><span>Dashboard</span></a>
+	@end
+</nav>
+
+@if ctx.pages.len > 0
+<nav class="site-pages" aria-label="Pages">
+	<p class="site-pages-title"><svg class="icon" aria-hidden="true"><use href="#i-file"></use></svg> Pages</p>
+	<ul class="site-pages-list">
+@for site_page in ctx.pages
+		<li><a href="/pages/@site_page.id">@site_page.title</a></li>
+@end
+	</ul>
+</nav>
+@end
+
+@if ctx.tags.len > 0
+<nav class="site-tags" aria-label="Tags">
+	<p class="site-pages-title"><svg class="icon" aria-hidden="true"><use href="#i-tag"></use></svg> Tags</p>
+	<div class="tag-cloud">
+@for post_tag in ctx.tags
+		<a class="tag-chip" href="/tag/@post_tag.tag">@post_tag.tag<span class="tag-count">@post_tag.count</span></a>
+@end
+	</div>
+</nav>
+@end
+</div>
+
+</div>
+</aside>

@@ -1,0 +1,11 @@
+@if ctx.is_admin
+<nav class="admin-bar" id="admin_controls" aria-label="Admin">
+	<button class="pure-button admin-bar-toggle" type="button" aria-expanded="false"><svg class="icon" aria-hidden="true"><use href="#i-menu"></use></svg><span>Admin</span></button>
+	<a class="pure-button button-success" href="/newpost"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>New post</a>
+	<a class="pure-button" href="/newpage"><svg class="icon" aria-hidden="true"><use href="#i-file"></use></svg>New page</a>
+	<a class="pure-button" href="/admin"><svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>Dashboard</a>
+	<a class="pure-button" href="/media"><svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg>Media</a>
+	<a class="pure-button" href="/settings"><svg class="icon" aria-hidden="true"><use href="#i-sliders"></use></svg>Settings</a>
+	<a class="pure-button button-error" href="/logout"><svg class="icon" aria-hidden="true"><use href="#i-logout"></use></svg>Log out</a>
+</nav>
+@end
