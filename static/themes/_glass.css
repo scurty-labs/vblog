@@ -560,10 +560,10 @@ body::after {
 
 /* Pagination floats in the bottom-right corner and stays there while the
    page scrolls, so it never wanders off-screen on long archives. The numbers
-   sit bare on the page: no pill, no boxes, just links. */
+   sit bare on the page: no pill, no boxes, just links coloured by the theme. */
 .pagination {
 	position: sticky;
-	bottom: 0.9rem;
+	bottom: 0.4rem;
 	z-index: 25;
 	width: fit-content;
 	margin: auto 0 0 auto;
@@ -572,7 +572,7 @@ body::after {
 
 /* Clear the fixed admin dock on posts and pages. */
 body:has(.admin-bar) .pagination {
-	bottom: 4.9rem;
+	bottom: 4.4rem;
 }
 
 .page_list {
@@ -595,15 +595,23 @@ body:has(.admin-bar) .pagination {
 }
 
 .page-link:hover,
+.page-link:focus,
+.page-link.is-current {
+	color: var(--link);
+}
+
+.page-link:hover,
 .page-link:focus {
-	color: var(--heading);
 	text-decoration: underline;
-	text-underline-offset: 0.25rem;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 0.3rem;
 }
 
 .page-link.is-current {
-	color: color-mix(in srgb, var(--accent) 74%, var(--heading));
 	font-weight: 700;
+	text-decoration: underline;
+	text-decoration-thickness: 2px;
+	text-underline-offset: 0.3rem;
 }
 
 .page-indicator,
@@ -864,11 +872,11 @@ body:has(.admin-bar) {
 	}
 
 	.pagination {
-		bottom: 0.75rem;
+		bottom: 0.35rem;
 	}
 
 	body:has(.admin-bar) .pagination {
-		bottom: 4.6rem;
+		bottom: 4.25rem;
 	}
 }
 
