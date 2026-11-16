@@ -5,7 +5,7 @@ import strconv
 // ensure_settings_schema creates the single-row settings table, seeds it, and
 // upgrades databases that still use the legacy key/value `setting` table.
 fn (mut app App) ensure_settings_schema() {
-	app.db.execute("CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY CHECK (id = 1), blog_title TEXT NOT NULL DEFAULT '', blog_description TEXT NOT NULL DEFAULT '', accent_foreground TEXT NOT NULL DEFAULT '#007711', theme TEXT NOT NULL DEFAULT 'default', posts_per_page INTEGER NOT NULL DEFAULT 10)") or {
+	app.db.execute("CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY CHECK (id = 1), blog_title TEXT NOT NULL DEFAULT '', blog_description TEXT NOT NULL DEFAULT '', footer_text TEXT NOT NULL DEFAULT '${default_footer_text}', accent_foreground TEXT NOT NULL DEFAULT '#007711', theme TEXT NOT NULL DEFAULT '${default_theme}', posts_per_page INTEGER NOT NULL DEFAULT 10)") or {
 		panic(err)
 	}
 
@@ -22,6 +22,20 @@ fn (mut app App) ensure_settings_schema() {
 	}
 
 	app.migrate_legacy_settings()
+	app.migrate_default_theme()
+}
+
+// migrate_default_theme moves databases still on the old default over to the
+// new one once. user_version guards it, so picking 'default' later still sticks.
+fn (mut app App) migrate_default_theme() {
+	versions := app.db.execute('PRAGMA user_version') or { return }
+	if versions.len > 0 && versions[0].vals.len > 0 && versions[0].vals[0].int() >= 1 {
+		return
+	}
+	app.db.execute("UPDATE settings SET theme = '${default_theme}' WHERE theme = 'default'") or {
+		return
+	}
+	app.db.execute('PRAGMA user_version = 1') or {}
 }
 
 // upgrade_settings_table adds the theme column to databases created before
@@ -31,6 +45,7 @@ fn (mut app App) upgrade_settings_table() {
 	columns := app.db.execute('PRAGMA table_info(settings)') or { return }
 	mut has_theme := false
 	mut has_custom_css := false
+	mut has_footer := false
 	for row in columns {
 		if row.vals.len < 2 {
 			continue
@@ -38,13 +53,20 @@ fn (mut app App) upgrade_settings_table() {
 		match row.vals[1] {
 			'theme' { has_theme = true }
 			'custom_css' { has_custom_css = true }
+			'footer_text' { has_footer = true }
 			else {}
 		}
 	}
 
 	if !has_theme {
-		app.db.execute("ALTER TABLE settings ADD COLUMN theme TEXT NOT NULL DEFAULT 'default'") or {
+		app.db.execute("ALTER TABLE settings ADD COLUMN theme TEXT NOT NULL DEFAULT '${default_theme}'") or {
 			eprintln("Couldn't add the theme column: ${err}")
+		}
+	}
+
+	if !has_footer {
+		app.db.execute("ALTER TABLE settings ADD COLUMN footer_text TEXT NOT NULL DEFAULT '${default_footer_text}'") or {
+			eprintln("Couldn't add the footer_text column: ${err}")
 		}
 	}
 
@@ -94,6 +116,6 @@ fn (mut app App) migrate_legacy_settings() {
 
 fn (mut app App) write_settings(settings Settings) ! {
 	sql app.db {
-		update Settings set blog_title = settings.blog_title, blog_description = settings.blog_description, accent_foreground = settings.accent_foreground, theme = settings.theme, posts_per_page = settings.posts_per_page where id == 1
+		update Settings set blog_title = settings.blog_title, blog_description = settings.blog_description, footer_text = settings.footer_text, accent_foreground = settings.accent_foreground, theme = settings.theme, posts_per_page = settings.posts_per_page where id == 1
 	}!
 }

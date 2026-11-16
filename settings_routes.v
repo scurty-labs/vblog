@@ -13,6 +13,7 @@ pub fn (mut app App) save_settings(mut ctx Context) veb.Result {
 	mut settings := app.load_settings()
 	settings.blog_title = (ctx.form['blog_title'] or { settings.blog_title }).trim_space()
 	settings.blog_description = ctx.form['blog_description'] or { settings.blog_description }
+	settings.footer_text = (ctx.form['footer_text'] or { settings.footer_text }).trim_space()
 	accent := (ctx.form['accent_foreground'] or { settings.accent_foreground }).trim_space()
 	if accent.len > 0 {
 		settings.accent_foreground = accent
@@ -32,5 +33,5 @@ pub fn (mut app App) save_settings(mut ctx Context) veb.Result {
 		return app.settings(mut ctx)
 	}
 
-	return app.r_home(mut ctx)
+	return ctx.redirect('/settings')
 }
