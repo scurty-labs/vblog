@@ -1,0 +1,86 @@
+@include 'header'
+
+<div class="dash">
+@include 'admin_nav'
+<main class="dash-main">
+
+	<header class="dash-topbar">
+		<div class="dash-heading">
+			<p class="dash-eyebrow">Admin</p>
+			<h1 class="dash-title">Tags</h1>
+			<p class="dash-subtitle">Rename a tag on every post at once, remove it everywhere, or attach a new tag to a post.</p>
+		</div>
+		<div class="dash-actions">
+			<a class="pure-button" href="/admin"><svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>Dashboard</a>
+		</div>
+	</header>
+
+	@if ctx.tags.len > 0
+	<section class="dash-panel">
+		<header class="dash-panel-head">
+			<h2>All tags</h2>
+		</header>
+		<table class="dash-table">
+			<thead>
+				<tr>
+					<th scope="col">Tag</th>
+					<th scope="col">Posts</th>
+					<th scope="col" class="dash-actions-col">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+@for t in ctx.tags
+				<tr>
+					<td><a class="post-link" href="/tag/@t.tag">@t.tag</a></td>
+					<td class="dash-date">@t.count</td>
+					<td class="dash-row-actions">
+						<form class="tag-action" method="post" action="/tags/rename">
+							<input type="hidden" name="old" value="@t.tag">
+							<input class="field-input tag-rename-input" type="text" name="new" value="@t.tag" maxlength="40" aria-label="New name for @t.tag">
+							<button type="submit" title="Rename tag" aria-label="Rename @t.tag"><svg class="icon" aria-hidden="true"><use href="#i-edit"></use></svg></button>
+						</form>
+						<form class="tag-action" method="post" action="/tags/remove" onsubmit="return confirm('Remove this tag from every post?')">
+							<input type="hidden" name="tag" value="@t.tag">
+							<button class="action-danger" type="submit" title="Remove tag" aria-label="Remove @t.tag"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></button>
+						</form>
+					</td>
+				</tr>
+@end
+			</tbody>
+		</table>
+	</section>
+	@else
+	<section class="dash-panel">
+		<p class="dash-empty">No tags yet. Tags appear here once a post uses them — or attach one below.</p>
+	</section>
+	@end
+
+	@if ctx.recent_posts.len > 0
+	<section class="dash-panel">
+		<header class="dash-panel-head">
+			<h2>Add a tag</h2>
+		</header>
+		<form class="pure-form form-stack" method="post" action="/tags/add">
+			<div class="field-row">
+				<label class="field">
+					<span class="field-label">Tag name</span>
+					<input class="field-input" type="text" name="tag" maxlength="40" placeholder="e.g. v-lang">
+				</label>
+				<label class="field">
+					<span class="field-label">Attach to post</span>
+					<select class="field-input field-select" name="post_id">
+@for post in ctx.recent_posts
+						<option value="@post.id">@post.title</option>
+@end
+					</select>
+				</label>
+			</div>
+			<button class="button-success pure-button" type="submit"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Add tag</button>
+		</form>
+	</section>
+	@end
+
+</main>
+</div>
+
+@include 'footer'

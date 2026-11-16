@@ -458,6 +458,50 @@
 	color: color-mix(in srgb, #e11d48 78%, var(--text));
 }
 
+/* Tag manager rows: the rename field and its buttons sit inline in the
+   actions cell, styled like the surrounding icon links. */
+.tag-action {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	margin: 0;
+}
+
+.tag-rename-input {
+	width: 9rem;
+	padding: 0.32rem 0.55rem;
+	font-size: 0.85rem;
+}
+
+.dash-row-actions button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.75rem;
+	height: 1.75rem;
+	padding: 0;
+	border: 1px solid transparent;
+	border-radius: var(--radius-sm);
+	background: none;
+	color: var(--link);
+	cursor: pointer;
+	transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.dash-row-actions button:hover {
+	background: var(--panel-strong);
+	border-color: var(--panel-border);
+}
+
+.dash-row-actions button .icon {
+	width: 1rem;
+	height: 1rem;
+}
+
+.dash-row-actions button.action-danger {
+	color: color-mix(in srgb, #e11d48 78%, var(--text));
+}
+
 .dash-empty {
 	margin: 0;
 	color: var(--muted);
