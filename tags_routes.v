@@ -19,7 +19,7 @@ pub fn (mut app App) tags(mut ctx Context) veb.Result {
 @['/tags/rename'; post]
 pub fn (mut app App) rename_tag_handle(mut ctx Context) veb.Result {
 	app.prepare(mut ctx)
-	if !ctx.is_admin {
+	if !app.is_admin_request(ctx) {
 		return app.r_home(mut ctx)
 	}
 	old := normalize_tag(ctx.form['old'] or { '' })
@@ -33,7 +33,7 @@ pub fn (mut app App) rename_tag_handle(mut ctx Context) veb.Result {
 @['/tags/remove'; post]
 pub fn (mut app App) remove_tag_handle(mut ctx Context) veb.Result {
 	app.prepare(mut ctx)
-	if !ctx.is_admin {
+	if !app.is_admin_request(ctx) {
 		return app.r_home(mut ctx)
 	}
 	tag := normalize_tag(ctx.form['tag'] or { '' })
@@ -46,7 +46,7 @@ pub fn (mut app App) remove_tag_handle(mut ctx Context) veb.Result {
 @['/tags/add'; post]
 pub fn (mut app App) add_tag_handle(mut ctx Context) veb.Result {
 	app.prepare(mut ctx)
-	if !ctx.is_admin {
+	if !app.is_admin_request(ctx) {
 		return app.r_home(mut ctx)
 	}
 	tag := (ctx.form['tag'] or { '' }).trim_space()

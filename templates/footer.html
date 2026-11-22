@@ -1,6 +1,8 @@
+@if ctx.settings.show_footer != 0
 <footer class="site-footer blog_footer">
 <div class="site-footer-text">@{ ctx.as_html(ctx.settings.footer_text) }</div>
 </footer>
+@end
 
 </body>
 </html>

@@ -1,48 +1,77 @@
 @include 'header'
 
-<!-- Sidebar -->
-<div class="sidebar pure-u-1 pure-u-md-1-4">
-<div class="sidebar_content">
+@include 'admin_bar'
 
-<div class="accent_bar"></div>
-<h1 class="blog_title"><a href="/">@ctx.settings.blog_title</a></h1>
-<p class="blog_desc">@ctx.settings.blog_description</p>
+<div class="site-shell">
 
-<form class="search pure-form" method="post" action="/searchresults">
-	<input class="search_box pure-input-rounded" style="width: 100%;" type="text" name="search" placeholder="Search..."><br/><br/>
-</form>
+@include 'sidebar'
 
-</div>
-</div>
+<main class="site-main content">
 
-<div class="content pure-u-1 pure-u-md-3-4">
+<article class="post-single">
 
-@if ctx.is_admin
-<div id="admin_controls">
-<a class="button-success pure-button" href="/newpost">New Post</a>
-<a class="pure-button" href="/settings">Admin</a>
-<a class="button-error pure-button" href="/logout">Logout</a>
+@if post.is_draft() || post.is_scheduled()
+<div class="post-preview-note">
+	<svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg>
+	@if post.is_draft()
+	<span>Draft preview &mdash; only you can see this post.</span>
+	@else
+	<span>Scheduled for @ctx.format_datetime(post.published_time()) &mdash; only you can see this post.</span>
+	@end
 </div>
 @end
 
-<!-- Posts -->
-<div class="view_post_header">
+<header class="post-hero view_post_header reveal">
 
-<h2 class="post_title accent_text">@post.title</h2>
-<div class="post_meta"><i>@post.format_date()</i></div>
+<h2 class="post-title post_title accent_text">@post.title</h2>
+<div class="post-meta post_meta">
+	<time datetime="@ctx.post_date(post)">@ctx.post_date(post)</time>
+	<span class="post-reading"><svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg>@post.reading_time() min read</span>
+</div>
+@if post.tag_list().len > 0
+<div class="post-tags view-post-tags">
+@for post_tag in post.tag_list()
+	<a class="tag-chip" href="/tag/@post_tag">@post_tag</a>
+@end
+</div>
+@end
 @if ctx.is_admin
-<span class="post_actions"><a href="/delete/post/@post.id" style="color: rgb(202, 60, 60);">Delete</a> | <a href="/edit/post/@post.id">Edit</a></span>
+<div class="post-actions post_actions view-post-actions">
+	<a class="pure-button" href="/edit/post/@post.id"><svg class="icon" aria-hidden="true"><use href="#i-edit"></use></svg>Edit post</a>
+	@if post.is_draft() || post.is_scheduled()
+	<a class="pure-button button-success" href="/publish/post/@post.id"><svg class="icon" aria-hidden="true"><use href="#i-send"></use></svg>Publish now</a>
+	@else
+	<a class="pure-button" href="/unpublish/post/@post.id"><svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>Move to drafts</a>
+	@end
+	<a class="pure-button" href="/promote/post/@post.id"><svg class="icon" aria-hidden="true"><use href="#i-file"></use></svg>Promote to page</a>
+	<a class="pure-button button-error" href="/delete/post/@post.id" onclick="return confirm('Delete this post?')"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg>Delete</a>
+</div>
 @end
 
-</div>
+</header>
 
-<div class="view_post_content">
-	<div class="post_content">@{ ctx.as_html(post.body) }</div>
+<div class="post-body view_post_content">
+	<div class="post-content post_content">@{ ctx.as_html(post.body) }</div>
 	<div class="post_footer"></div>
 </div>
 
+@if ctx.related_posts.len > 0
+<section class="related-posts" aria-label="Related posts">
+	<h2 class="related-title"><svg class="icon" aria-hidden="true"><use href="#i-link"></use></svg>Keep reading</h2>
+	<div class="related-grid">
+@for related in ctx.related_posts
+		<a class="related-card" href="/view/post/@related.id">
+			<span class="related-card-title">@related.title</span>
+			<span class="related-card-meta">@ctx.post_date(related) &middot; @related.reading_time() min read</span>
+		</a>
+@end
+	</div>
+</section>
+@end
 
-</div>
+</article>
+
+</main>
 
 </div>
 

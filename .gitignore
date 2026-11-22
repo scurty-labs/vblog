@@ -1,2 +1,23 @@
+# build output
 vblog
+*.exe
+*.o
+*.v.c
+*.v.c.out
+*.v3cc
+
+# local state: never part of the repository
 config.json
+config.json.bak
+primary.sqlite
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+media/*
+!media/.gitkeep
+backups/
+*.log
+
+# editor and IDE settings
+.idea/
+.vscode/

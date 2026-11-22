@@ -1,15 +1,39 @@
-/* Ocean: pale blue page with deep navy surfaces. */
+@import url("/themes/_glass.css");
+
+/* Ocean: pale aqua, flush-left rail, airy reading column. */
 :root {
-	--page-bg: #e6f0f5;
-	--surface: #0b3c5d;
-	--surface-text: #b8d0dd;
-	--heading: #ffffff;
-	--text: #16313f;
-	--muted: #6a8794;
-	--link-muted: #6a8794;
-	--code-bg: #d3e4ec;
-	--code-text: #16313f;
-	--input-bg: #10455f;
-	--input-text: #ffffff;
-	--input-focus-bg: #1a6785;
+	--page-bg: #e8f3f6;
+	--glow-a: rgba(14, 116, 144, 0.24);
+	--glow-b: rgba(20, 184, 166, 0.2);
+	--glow-c: rgba(59, 130, 246, 0.16);
+	--panel: rgba(255, 255, 255, 0.54);
+	--panel-strong: rgba(255, 255, 255, 0.78);
+	--panel-border: rgba(8, 47, 73, 0.14);
+	--hairline: rgba(8, 47, 73, 0.26);
+	--shadow: 0 16px 36px rgba(8, 47, 73, 0.14);
+	--text: #12303f;
+	--heading: #062330;
+	--muted: #4e6f7f;
+	--surface-text: #1d4557;
+	--link: #0e6f8f;
+	--code-bg: rgba(217, 233, 239, 0.92);
+	--code-text: #12303f;
+	--input-bg: rgba(255, 255, 255, 0.62);
+	--input-text: #08222e;
+	--input-focus-bg: #ffffff;
+	--noise: 0.12;
+	--radius: 8px;
+}
+
+.theme-ocean .site-sidebar .site-title {
+	font-size: 1.25rem;
+	line-height: 1.2;
+}
+
+.theme-ocean .site-description {
+	font-size: 0.82rem;
+}
+
+.theme-ocean .view_post_content .post_content {
+	font-size: 1.05rem;
 }

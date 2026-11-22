@@ -421,14 +421,28 @@
 	white-space: nowrap;
 }
 
+/* This class sits on a <td>, so it has to stay a table cell: turning it into
+   a flex container takes it out of the table, which draws its bottom border at
+   the button height instead of the row height and leaves the row looking cut.
+   The icons are laid out by the .row-actions wrapper instead. */
 .dash-row-actions {
+	text-align: right;
+	white-space: nowrap;
+	font-size: 0.82rem;
+}
+
+/* Outranks `.dash-table td`, which aligns every other cell to the top; actions
+   look off-balance there because rows with tags are taller than the icons. */
+.dash-table td.dash-row-actions {
+	vertical-align: middle;
+}
+
+.row-actions {
 	display: flex;
 	flex-wrap: nowrap;
 	align-items: center;
 	justify-content: flex-end;
 	gap: 0.2rem;
-	white-space: nowrap;
-	font-size: 0.82rem;
 }
 
 .dash-row-actions a {
@@ -473,17 +487,23 @@
 	font-size: 0.85rem;
 }
 
+/* Row buttons are square by default, but buttons that carry a label (such as
+   Backups > Restore) need room for it: min-width keeps the icon-only ones at
+   28px while padding lets the text ones grow instead of spilling out. */
 .dash-row-actions button {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 1.75rem;
+	gap: 0.3rem;
+	width: auto;
+	min-width: 1.75rem;
 	height: 1.75rem;
-	padding: 0;
+	padding: 0 0.4rem;
 	border: 1px solid transparent;
 	border-radius: var(--radius-sm);
 	background: none;
 	color: var(--link);
+	white-space: nowrap;
 	cursor: pointer;
 	transition: background 0.2s ease, border-color 0.2s ease;
 }
@@ -500,6 +520,53 @@
 
 .dash-row-actions button.action-danger {
 	color: color-mix(in srgb, #e11d48 78%, var(--text));
+}
+
+/* Row action menus: the action links sit inline in the row on wide screens
+   and collapse behind a "..." toggle on small ones (see the responsive
+   block at the end of this file). */
+.row-menu {
+	display: inline-flex;
+	justify-content: flex-end;
+}
+
+/* Scoped to .row-menu so it outranks the `.dash-row-actions button` styles
+   that make the row buttons inline. */
+.row-menu .row-menu-toggle {
+	display: none;
+	align-items: center;
+	justify-content: center;
+	width: 1.75rem;
+	height: 1.75rem;
+	padding: 0;
+	border: 1px solid transparent;
+	border-radius: var(--radius-sm);
+	background: none;
+	color: var(--link);
+	cursor: pointer;
+	transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.row-menu-toggle:hover,
+.row-menu.is-open .row-menu-toggle {
+	background: var(--panel-strong);
+	border-color: var(--panel-border);
+}
+
+.row-menu-toggle .icon {
+	width: 1rem;
+	height: 1rem;
+}
+
+.row-menu-list {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 0.2rem;
+}
+
+.row-menu-text {
+	display: none;
 }
 
 .dash-empty {
@@ -598,5 +665,653 @@
 
 	.dash-grid {
 		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+/* Phones: the post rows would push their action buttons past the edge of the
+   screen, so the row actions collapse into a small menu behind a "..."
+   toggle. The toggle only appears when JS runs; without it the links stay
+   visible and the table scrolls as before. */
+@media (max-width: 48em) {
+	.js .row-menu {
+		position: relative;
+	}
+
+	.js .row-menu .row-menu-toggle {
+		display: inline-flex;
+	}
+
+	.js .row-menu-list {
+		position: absolute;
+		top: calc(100% + 0.3rem);
+		right: 0;
+		z-index: 25;
+		display: none;
+		flex-direction: column;
+		align-items: stretch;
+		gap: 0.1rem;
+		min-width: 10.5rem;
+		padding: 0.3rem;
+		border: 1px solid var(--panel-border);
+		border-radius: var(--radius-sm);
+		background:
+			linear-gradient(118deg, rgba(255, 255, 255, 0.12), transparent 45%),
+			linear-gradient(160deg, var(--panel-strong), var(--panel));
+		-webkit-backdrop-filter: var(--blur);
+		backdrop-filter: var(--blur);
+		box-shadow: var(--shadow);
+	}
+
+	.js .row-menu.is-open .row-menu-list {
+		display: flex;
+	}
+
+	.js .row-menu-list a {
+		justify-content: flex-start;
+		width: 100%;
+		height: auto;
+		gap: 0.55rem;
+		padding: 0.4rem 0.55rem;
+	}
+
+	.js .row-menu-list .row-menu-text {
+		display: inline;
+	}
+
+	/* Tables on a phone: four or five columns cannot share 390px, and the
+	   action cell was pushed past the panel edge (the Restore button on
+	   Backups was off screen entirely). Each row becomes a small stack
+	   instead: the primary cell spans the row, the metadata sits under it and
+	   the actions keep a line of their own. */
+	.dash-table thead {
+		display: none;
+	}
+
+	.dash-table,
+	.dash-table tbody,
+	.dash-table tr,
+	.dash-table td {
+		display: block;
+	}
+
+	.dash-table tr {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.2rem 0.75rem;
+		padding: 0.75rem 0;
+		border-bottom: 1px solid color-mix(in srgb, var(--panel-border) 55%, transparent);
+	}
+
+	.dash-table td {
+		padding: 0;
+		border: 0;
+	}
+
+	.dash-table tr:last-child,
+	.dash-table tbody tr:last-child td {
+		border-bottom: 0;
+	}
+
+	.dash-table td:first-child {
+		flex: 1 1 100%;
+	}
+
+	.dash-table .dash-row-actions {
+		margin-left: auto;
+	}
+
+	/* Pages are only a title and its links, so those stay on one line. */
+	.pages-table td:first-child {
+		flex: 1 1 auto;
+	}
+
+	/* Tag rows: the rename field takes the space the tag name leaves. */
+	.tags-table .dash-row-actions {
+		flex: 1 1 100%;
+	}
+
+	.tags-table .tag-action:first-child,
+	.tags-table .tag-rename-input {
+		flex: 1 1 auto;
+		width: auto;
+		min-width: 0;
+	}
+
+	/* Without the header row a bare count is meaningless. */
+	.tags-table td:nth-child(2)::before {
+		content: "posts ";
+		color: var(--muted);
+		font-size: 0.68rem;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+}
+
+/* --- SWITCHES --- */
+
+/* A real checkbox drawn as a track and knob, so the on/off state is obvious on
+   every theme. The input keeps its keyboard and screen reader behaviour; only
+   its looks are replaced. Qualified with `label` so `.pure-form label {
+   display: block }` cannot win: with a block label the track has no flex line
+   to size it, so it collapses to nothing and its knob is drawn over the start
+   of the text. */
+label.switch-field {
+	position: relative;
+	display: flex;
+	align-items: flex-start;
+	gap: 0.75rem;
+	margin: 0.9rem 0;
+	cursor: pointer;
+}
+
+.switch-input {
+	position: absolute;
+	top: 0.15rem;
+	left: 0;
+	width: 2.4rem;
+	height: 1.4rem;
+	margin: 0;
+	opacity: 0;
+	cursor: pointer;
+}
+
+.switch-track {
+	position: relative;
+	flex: 0 0 auto;
+	width: 2.4rem;
+	height: 1.4rem;
+	margin-top: 0.05rem;
+	border: 1px solid var(--panel-border);
+	border-radius: 999px;
+	background: var(--input-bg);
+	transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.switch-track::after {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 0.2rem;
+	width: 0.95rem;
+	height: 0.95rem;
+	transform: translateY(-50%);
+	border-radius: 50%;
+	background: var(--muted);
+	transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.switch-input:checked + .switch-track {
+	border-color: color-mix(in srgb, var(--accent) 70%, transparent);
+	background: color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.switch-input:checked + .switch-track::after {
+	transform: translate(1rem, -50%);
+	background: #ffffff;
+}
+
+.switch-input:focus-visible + .switch-track {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
+}
+
+.switch-text {
+	color: var(--surface-text);
+	font-size: 0.92rem;
+	line-height: 1.4;
+}
+
+.switch-text small {
+	display: block;
+	margin-top: 0.15rem;
+	color: var(--muted);
+	font-size: 0.78rem;
+}
+
+/* --- SETTINGS --- */
+
+/* The page is a stack of labelled groups: each keeps its name and purpose in a
+   rail of its own and its controls in the other column, so a long form still
+   scans top-down. */
+.settings-index {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+	margin: 0 0 1.25rem;
+	padding: 0;
+}
+
+.settings-index a {
+	padding: 0.32rem 0.7rem;
+	border: 1px solid var(--panel-border);
+	border-radius: 999px;
+	color: var(--muted);
+	font-size: 0.8rem;
+	text-decoration: none;
+	transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.settings-index a:hover,
+.settings-index a:focus-visible {
+	border-color: var(--hairline);
+	background: var(--panel-strong);
+	color: var(--heading);
+}
+
+.settings-group {
+	display: grid;
+	grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+	gap: 0 2rem;
+	padding: clamp(1.15rem, 2.2vw, 1.75rem);
+	scroll-margin-top: 5rem;
+}
+
+.settings-group-title {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.settings-group-title .icon {
+	width: 1rem;
+	height: 1rem;
+	flex: 0 0 auto;
+	color: var(--accent);
+}
+
+.settings-group-hint {
+	margin: 0.35rem 0 0;
+	color: var(--muted);
+	font-size: 0.85rem;
+	line-height: 1.5;
+}
+
+.settings-group-body {
+	min-width: 0;
+}
+
+/* Branding holds two assets: the logo and the favicon. */
+.settings-asset + .settings-asset {
+	margin-top: 1.5rem;
+	padding-top: 1.5rem;
+	border-top: 1px solid color-mix(in srgb, var(--panel-border) 65%, transparent);
+}
+
+.settings-subtitle {
+	margin: 0 0 0.25rem;
+	color: var(--heading);
+	font-size: 0.95rem;
+	font-weight: 700;
+}
+
+.settings-subhint {
+	margin: 0 0 0.9rem;
+	color: var(--muted);
+	font-size: 0.82rem;
+	line-height: 1.5;
+}
+
+/* Upload row: the file picker flexes and the button keeps its own width. */
+.settings-upload-field {
+	margin: 0 0 1rem;
+}
+
+.settings-upload {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.6rem;
+}
+
+.settings-upload .settings-file {
+	flex: 1 1 15rem;
+	width: auto;
+	min-width: 0;
+	padding: 0.4rem 0.5rem;
+	font-size: 0.85rem;
+}
+
+.settings-upload .pure-button {
+	flex: 0 0 auto;
+}
+
+.field-hint {
+	display: block;
+	margin-top: 0.35rem;
+	color: var(--muted);
+	font-size: 0.78rem;
+	line-height: 1.45;
+}
+
+/* Numbers and colours do not need the whole column. */
+.settings-field-narrow {
+	max-width: 17rem;
+}
+
+.settings-textarea {
+	min-height: 6em;
+}
+
+.settings-color {
+	display: flex;
+	align-items: center;
+	gap: 0.55rem;
+}
+
+.settings-color .swatch {
+	width: 1.9rem;
+	height: 1.9rem;
+	border-radius: var(--radius-sm);
+}
+
+.settings-color .field-input {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+/* Switches read as a tidy two-column list where there is room. */
+.settings-switches {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(13.5rem, 1fr));
+	gap: 0.9rem 1.6rem;
+}
+
+.settings-switches label.switch-field {
+	margin: 0;
+}
+
+/* Saved/removed confirmation, the same shape as the backup notices. */
+.settings-note {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.5rem;
+	margin: 0 0 0.9rem;
+	padding: 0.6rem 0.8rem;
+	border: 1px solid var(--panel-border);
+	border-left: 3px solid var(--accent);
+	border-radius: var(--radius-sm);
+	background: var(--panel);
+	color: var(--text);
+	font-size: 0.85rem;
+	line-height: 1.5;
+}
+
+.settings-note .icon {
+	width: 1rem;
+	height: 1rem;
+	flex: 0 0 auto;
+	margin-top: 0.1rem;
+	color: var(--accent);
+}
+
+/* Save bar: stays in reach at the foot of the viewport while the form scrolls. */
+.settings-save {
+	position: sticky;
+	bottom: 0.9rem;
+	z-index: 20;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.6rem 1.25rem;
+	margin: 1.25rem 0 0;
+	padding: 0.75rem 0.9rem;
+	border: 1px solid var(--panel-border);
+	border-radius: var(--radius);
+	background: color-mix(in srgb, var(--page-bg) 72%, transparent);
+	-webkit-backdrop-filter: var(--blur);
+	backdrop-filter: var(--blur);
+	box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.settings-save-note {
+	margin: 0;
+	color: var(--muted);
+	font-size: 0.8rem;
+}
+
+/* Reminder that the form holds edits the server has not seen yet. */
+.settings-dirty {
+	color: var(--heading);
+	font-weight: 600;
+}
+
+/* A colour the server will refuse, flagged while it is typed. */
+.settings-color .field-input[aria-invalid="true"] {
+	border-color: #d4544a;
+	box-shadow: 0 0 0 3px rgba(212, 84, 74, 0.16);
+}
+
+/* Tablet and phones: one column, the group label above its controls. */
+@media (max-width: 62em) {
+	.settings-group {
+		grid-template-columns: minmax(0, 1fr);
+		gap: 0.9rem;
+	}
+}
+
+/* --- UPLOADED ICONS (logo, favicon) --- */
+
+/* The preview keeps the image at a small, fixed size, so a wide upload reads as
+   an icon instead of stretching across the panel. */
+.upload-current {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.75rem;
+	margin: 0 0 1rem;
+}
+
+.upload-preview {
+	width: 2rem;
+	height: 2rem;
+	flex: 0 0 auto;
+	border: 1px solid var(--panel-border);
+	border-radius: var(--radius-sm);
+	background: var(--panel);
+	object-fit: contain;
+}
+
+/* Logos are usually wider than they are tall: keep the height, let the width
+   follow the image up to a readable cap. */
+.upload-preview-wide {
+	width: auto;
+	max-width: 8rem;
+	height: 2.5rem;
+}
+
+.upload-path {
+	min-width: 0;
+	overflow: hidden;
+	color: var(--muted);
+	font-size: 0.85rem;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* --- BACKUPS --- */
+
+.inline-form {
+	display: inline;
+	margin: 0;
+}
+
+.backup-notices {
+	margin: 0 0 1.25rem;
+}
+
+.backup-note {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.55rem;
+	margin: 0 0 0.6rem;
+	padding: 0.7rem 0.9rem;
+	border: 1px solid var(--panel-border);
+	border-left: 3px solid var(--accent);
+	border-radius: var(--radius-sm);
+	background: var(--panel);
+	color: var(--text);
+	font-size: 0.9rem;
+	line-height: 1.5;
+}
+
+.backup-note .icon {
+	width: 1rem;
+	height: 1rem;
+	flex: 0 0 auto;
+	margin-top: 0.15rem;
+	color: var(--accent);
+}
+
+.backup-count {
+	color: var(--muted);
+	font-size: 0.8rem;
+}
+
+.backup-name {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 0.85rem;
+	overflow-wrap: anywhere;
+}
+
+.backup-badge {
+	margin-left: 0.5rem;
+	padding: 0.06rem 0.35rem;
+	border: 1px solid var(--panel-border);
+	border-radius: 3px;
+	color: var(--muted);
+	font-size: 0.62rem;
+	font-weight: 600;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+}
+
+.backup-hint {
+	margin: 0 0 1.5rem;
+	color: var(--muted);
+	font-size: 0.85rem;
+}
+
+/* The restore confirmation: a modal sized for one paragraph of warning. */
+.backup-dialog {
+	width: min(34rem, 92vw);
+	max-height: 90vh;
+	padding: 0;
+	overflow-y: auto;
+	border: 1px solid var(--panel-border);
+	border-radius: var(--radius);
+	background: var(--page-bg);
+	color: var(--text);
+	box-shadow: 0 30px 70px -30px #000;
+}
+
+.backup-dialog::backdrop {
+	background: rgba(0, 0, 0, 0.5);
+}
+
+.backup-dialog form {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	padding: clamp(1.25rem, 2.5vw, 1.75rem);
+}
+
+.backup-dialog-head {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.backup-dialog-title {
+	margin: 0;
+	color: var(--heading);
+	font-size: 1.15rem;
+}
+
+.backup-dialog-close {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2rem;
+	height: 2rem;
+	padding: 0;
+	border: 1px solid var(--panel-border);
+	border-radius: var(--radius-sm);
+	background: none;
+	color: var(--muted);
+	cursor: pointer;
+}
+
+.backup-dialog-close:hover {
+	color: var(--heading);
+	background: var(--panel-strong);
+}
+
+.backup-dialog-close .icon {
+	width: 1rem;
+	height: 1rem;
+}
+
+.backup-warning {
+	margin: 0;
+	padding: 0.8rem 0.95rem;
+	border: 1px solid color-mix(in srgb, #e11d48 42%, var(--panel-border));
+	border-radius: var(--radius-sm);
+	background: color-mix(in srgb, #e11d48 12%, transparent);
+	color: var(--text);
+	font-size: 0.9rem;
+	line-height: 1.55;
+}
+
+.backup-facts {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr);
+	gap: 0.5rem 1rem;
+	margin: 0;
+	font-size: 0.88rem;
+}
+
+.backup-facts dt {
+	align-self: center;
+	color: var(--muted);
+	font-size: 0.68rem;
+	font-weight: 600;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+}
+
+.backup-facts dd {
+	margin: 0;
+	overflow-wrap: anywhere;
+}
+
+.backup-dialog-actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: 0.6rem;
+}
+
+.button-danger {
+	border: 1px solid #991b1b;
+	background: #b91c1c;
+	color: #fff;
+}
+
+.button-danger:hover,
+.button-danger:focus {
+	background: #991b1b;
+	color: #fff;
+}
+
+@media (max-width: 40em) {
+	.backup-dialog-actions {
+		flex-direction: column-reverse;
+	}
+
+	.backup-dialog-actions .pure-button {
+		width: 100%;
 	}
 }

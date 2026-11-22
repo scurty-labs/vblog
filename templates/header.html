@@ -1,13 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<meta charset='utf-8'>
-	<title>@ctx.settings.blog_title</title>
+	<title>@ctx.page_title</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="@ctx.page_description">
+	<meta property="og:site_name" content="@ctx.settings.blog_title">
+	<meta property="og:type" content="@ctx.og_type">
+	<meta property="og:title" content="@ctx.page_title">
+	<meta property="og:description" content="@ctx.page_description">
+	<meta name="twitter:card" content="summary">
+	<link rel="alternate" type="application/rss+xml" title="@ctx.settings.blog_title RSS" href="/rss.xml">
+	@if ctx.settings.favicon_url != ''
+	<link rel="icon" href="@ctx.settings.favicon_url">
+	@end
+	@if ctx.settings.logo_enabled != 0 && ctx.settings.logo_url.len > 0
+	<link rel="apple-touch-icon" href="@ctx.settings.logo_url">
+	@end
 	<link rel="stylesheet" href="/pure-min.css">
 	<link rel="stylesheet" href="/pure-grids-responsive-min.css">
-	<link rel="stylesheet" href="/style.css">
-	<link rel="stylesheet" href="/themes/${ctx.settings.theme}.css">
+	<link rel="stylesheet" href="@{ ctx.asset_url('/style.css') }">
+	<link rel="stylesheet" href="@{ ctx.asset_url('/admin.css') }">
+	@if ctx.media_page
+	<link rel="stylesheet" href="@{ ctx.asset_url('/css/media.css') }">
+	@end
+	<link rel="stylesheet" href="@{ ctx.theme_url() }">
+	@if ctx.editor
+	<link rel="preload" href="/vendor/easymde/easymde.min.js" as="script">
+	<link rel="stylesheet" href="@{ ctx.asset_url('/css/editor-icons.css') }">
+	<link rel="stylesheet" href="/vendor/easymde/easymde.min.css">
+	<link rel="stylesheet" href="@{ ctx.asset_url('/css/editor.css') }">
+	@end
+	<script>document.documentElement.classList.add('js');</script>
+	@if ctx.editor
+	<script src="/vendor/easymde/easymde.min.js" defer></script>
+	@end
+	<script src="@{ ctx.asset_url('/js/site.js') }" defer></script>
+	@if ctx.media_page
+	<script src="@{ ctx.asset_url('/js/media.js') }" defer></script>
+	@end
+	@if ctx.backup_page
+	<script src="@{ ctx.asset_url('/js/backups.js') }" defer></script>
+	@end
 </head>
-<body style="--accent: ${ctx.settings.accent_foreground};">
+<body class="theme-${ctx.settings.theme}" data-theme="${ctx.settings.theme}" style="--accent: ${ctx.settings.accent_foreground};">
+@include 'icons'
 
+@include 'toasts'

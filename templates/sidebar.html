@@ -3,7 +3,12 @@
 
 <div class="accent_bar"></div>
 <h1 class="site-title blog_title"><a href="/">@ctx.settings.blog_title</a></h1>
+@if ctx.settings.logo_enabled != 0 && ctx.settings.logo_url.len > 0
+<div class="site-logo"><img src="@ctx.settings.logo_url" alt="@ctx.settings.blog_title" onerror="this.closest('.site-logo').hidden = true"></div>
+@end
+@if ctx.settings.show_description != 0
 <div class="site-description blog_desc">@{ ctx.as_html(ctx.settings.blog_description) }</div>
+@end
 
 <button class="site-menu-toggle" type="button" aria-expanded="false">
 	<svg class="icon" aria-hidden="true"><use href="#i-menu"></use></svg><span>Menu</span>
@@ -12,20 +17,22 @@
 <form class="site-search search pure-form" method="post" action="/searchresults" role="search">
 	<label class="search-field">
 		<svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg>
-		<input class="search_box pure-input-rounded" type="text" name="search" placeholder="Search..." value="${ctx.search_query}" aria-label="Search posts">
+		<input class="search_box pure-input-rounded" type="text" name="search" placeholder="Search..." value="${ctx.search_query}" aria-label="Search posts" autocomplete="off">
 	</label>
 </form>
 
 <div class="site-menus" id="site-menus">
 <nav class="site-nav" aria-label="Blog">
 	<a class="site-nav-link" href="/"><svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg><span>Home</span></a>
+	@if ctx.settings.show_rss != 0
 	<a class="site-nav-link" href="/rss.xml"><svg class="icon" aria-hidden="true"><use href="#i-rss"></use></svg><span>RSS feed</span></a>
+	@end
 	@if ctx.is_admin
 	<a class="site-nav-link" href="/admin"><svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg><span>Dashboard</span></a>
 	@end
 </nav>
 
-@if ctx.pages.len > 0
+@if ctx.settings.show_pages != 0 && ctx.pages.len > 0
 <nav class="site-pages" aria-label="Pages">
 	<p class="site-pages-title"><svg class="icon" aria-hidden="true"><use href="#i-file"></use></svg> Pages</p>
 	<ul class="site-pages-list">
@@ -36,7 +43,7 @@
 </nav>
 @end
 
-@if ctx.tags.len > 0
+@if ctx.settings.show_tags != 0 && ctx.tags.len > 0
 <nav class="site-tags" aria-label="Tags">
 	<p class="site-pages-title"><svg class="icon" aria-hidden="true"><use href="#i-tag"></use></svg> Tags</p>
 	<div class="tag-cloud">

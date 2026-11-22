@@ -20,7 +20,7 @@
 		<header class="dash-panel-head">
 			<h2>All tags</h2>
 		</header>
-		<table class="dash-table">
+		<table class="dash-table tags-table">
 			<thead>
 				<tr>
 					<th scope="col">Tag</th>
@@ -34,15 +34,17 @@
 					<td><a class="post-link" href="/tag/@t.tag">@t.tag</a></td>
 					<td class="dash-date">@t.count</td>
 					<td class="dash-row-actions">
-						<form class="tag-action" method="post" action="/tags/rename">
-							<input type="hidden" name="old" value="@t.tag">
-							<input class="field-input tag-rename-input" type="text" name="new" value="@t.tag" maxlength="40" aria-label="New name for @t.tag">
-							<button type="submit" title="Rename tag" aria-label="Rename @t.tag"><svg class="icon" aria-hidden="true"><use href="#i-edit"></use></svg></button>
-						</form>
-						<form class="tag-action" method="post" action="/tags/remove" onsubmit="return confirm('Remove this tag from every post?')">
-							<input type="hidden" name="tag" value="@t.tag">
-							<button class="action-danger" type="submit" title="Remove tag" aria-label="Remove @t.tag"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></button>
-						</form>
+						<div class="row-actions">
+							<form class="tag-action" method="post" action="/tags/rename">
+								<input type="hidden" name="old" value="@t.tag">
+								<input class="field-input tag-rename-input" type="text" name="new" value="@t.tag" maxlength="40" aria-label="New name for @t.tag" autocomplete="off">
+								<button type="submit" title="Rename tag" aria-label="Rename @t.tag"><svg class="icon" aria-hidden="true"><use href="#i-edit"></use></svg></button>
+							</form>
+							<form class="tag-action" method="post" action="/tags/remove" onsubmit="return confirm('Remove this tag from every post?')">
+								<input type="hidden" name="tag" value="@t.tag">
+								<button class="action-danger" type="submit" title="Remove tag" aria-label="Remove @t.tag"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></button>
+							</form>
+						</div>
 					</td>
 				</tr>
 @end
@@ -64,7 +66,7 @@
 			<div class="field-row">
 				<label class="field">
 					<span class="field-label">Tag name</span>
-					<input class="field-input" type="text" name="tag" maxlength="40" placeholder="e.g. v-lang">
+					<input class="field-input" type="text" name="tag" maxlength="40" placeholder="e.g. v-lang" autocomplete="off">
 				</label>
 				<label class="field">
 					<span class="field-label">Attach to post</span>

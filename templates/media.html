@@ -69,7 +69,7 @@
 		<input type="hidden" name="type" value="@ctx.media_kind">
 		<label class="search-field media-search">
 			<svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg>
-			<input class="field-input" type="search" name="q" value="@ctx.media_query" placeholder="Search by title, alt text or file name" aria-label="Search media">
+			<input class="field-input" type="search" name="q" value="@ctx.media_query" placeholder="Search media" aria-label="Search media" autocomplete="off">
 		</label>
 		<label class="media-sort">
 			<span class="field-label">Sort by</span>
@@ -156,11 +156,11 @@
 			</dl>
 			<label class="field">
 				<span class="field-label">Title</span>
-				<input class="field-input" type="text" name="media_title" value="@item.title" placeholder="Untitled">
+				<input class="field-input" type="text" name="media_title" value="@item.title" placeholder="Untitled" autocomplete="off">
 			</label>
 			<label class="field">
 				<span class="field-label">Alt text</span>
-				<input class="field-input" type="text" name="media_alt" value="@item.alt" placeholder="Describe the image for screen readers">
+				<input class="field-input" type="text" name="media_alt" value="@item.alt" placeholder="Describe the image for screen readers" autocomplete="off">
 			</label>
 			<footer class="media-dialog-actions">
 				<a class="pure-button" href="@item.url()" target="_blank" rel="noopener"><svg class="icon" aria-hidden="true"><use href="#i-external"></use></svg>Open</a>

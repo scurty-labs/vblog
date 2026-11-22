@@ -1,0 +1,185 @@
+@include 'header'
+
+<div class="dash">
+@include 'admin_nav'
+<main class="dash-main">
+
+	<header class="dash-topbar">
+		<div class="dash-heading">
+			<p class="dash-eyebrow">Safety net</p>
+			<h1 class="dash-title">Backups</h1>
+			<p class="dash-subtitle">Each backup is a folder in <code>backups/</code> holding the database, <code>config.json</code> and <code>media/</code>.</p>
+		</div>
+		<div class="dash-actions">
+			<a class="pure-button" href="/admin"><svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>Dashboard</a>
+			<form class="inline-form" method="post" action="/backups/create">
+				<button class="button-success pure-button" type="submit"><svg class="icon" aria-hidden="true"><use href="#i-archive"></use></svg>Back up now</button>
+			</form>
+		</div>
+	</header>
+
+	@if ctx.backup_show_message()
+	<div class="backup-notices">
+		@if ctx.backup_created.len > 0
+		<p class="backup-note"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg><span>Backup <code>@ctx.backup_created</code> written to <code>backups/</code>.</span></p>
+		@end
+		@if ctx.backup_restored.len > 0
+		<p class="backup-note"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg><span>Restored <code>@ctx.backup_restored</code>. The blog now shows that copy, including its settings and media.</span></p>
+		@end
+		@if ctx.backup_saved.len > 0
+		<p class="backup-note"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg><span>Schedule saved. Automatic backups run while <code>./vblog</code> is serving.</span></p>
+		@end
+		@if ctx.backup_error == 'create'
+		<p class="form-error">Couldn't write the backup. Check that the server can write to <code>backups/</code>.</p>
+		@end
+		@if ctx.backup_error == 'schedule'
+		<p class="form-error">Couldn't save the schedule. Check that the server can write to <code>backups/</code>.</p>
+		@end
+		@if ctx.backup_error == 'restore'
+		<p class="form-error">Couldn't restore that backup. Nothing was changed unless the message says otherwise; check the server log.</p>
+		@end
+	</div>
+	@end
+
+	<section class="stat-grid" aria-label="Backup statistics">
+		<article class="stat-card">
+			<span class="stat-label">Backups</span>
+			<span class="stat-value">@ctx.backup_count</span>
+			<span class="stat-note">available to restore</span>
+		</article>
+		<article class="stat-card">
+			<span class="stat-label">Storage</span>
+			<span class="stat-value stat-value-text">@ctx.backup_bytes_label()</span>
+			<span class="stat-note">in <code>backups/</code></span>
+		</article>
+		<article class="stat-card">
+			<span class="stat-label">Latest</span>
+			<span class="stat-value stat-value-text">@ctx.backup_latest_label()</span>
+			<span class="stat-note">newest copy</span>
+		</article>
+		<article class="stat-card">
+			<span class="stat-label">Auto backup</span>
+			<span class="stat-value stat-value-text">@ctx.backup_schedule_label()</span>
+			<span class="stat-note">@ctx.backup_next_label()</span>
+		</article>
+	</section>
+
+	<form class="dash-panel pure-form form-stack" method="post" action="/backups/schedule">
+
+		<section class="form-section">
+			<h2 class="form-section-title">Automatic backups</h2>
+			<p class="form-section-hint">The server copies the blog on its own schedule while it runs. Old copies are pruned so the folder never fills up.</p>
+
+			<label class="switch-field">
+				<input class="switch-input" type="checkbox" name="backup_enabled" value="1" @{ ctx.backup_enabled_attr() }>
+				<span class="switch-track" aria-hidden="true"></span>
+				<span class="switch-text">Back up automatically<small>Runs in the background while <code>./vblog</code> is serving.</small></span>
+			</label>
+
+			<div class="field-row">
+				<label class="field">
+					<span class="field-label">How often</span>
+					<select class="field-input field-select" name="backup_interval_hours">
+@for hours in ctx.backup_intervals
+						<option value="@hours"@{ ctx.backup_interval_selected(hours) }>@ctx.backup_interval_label(hours)</option>
+@end
+					</select>
+				</label>
+				<label class="field">
+					<span class="field-label">Keep</span>
+					<input class="field-input" type="number" name="backup_keep" min="1" max="100" value="@ctx.backup_schedule.keep">
+					<span class="editor-hint">Backups beyond this many are deleted, oldest first.</span>
+				</label>
+			</div>
+		</section>
+
+		<button class="button-success pure-button" type="submit"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Save schedule</button>
+	</form>
+
+	<section class="dash-panel">
+		<header class="dash-panel-head">
+			<h2>Available backups</h2>
+			<span class="backup-count">@ctx.backup_count on disk</span>
+		</header>
+
+		@if ctx.backups.len > 0
+		<table class="dash-table backups-table">
+			<thead>
+				<tr>
+					<th scope="col">Backup</th>
+					<th scope="col">Taken</th>
+					<th scope="col">Size</th>
+					<th scope="col">Media</th>
+					<th scope="col" class="dash-actions-col">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+@for entry in ctx.backups
+				<tr>
+					<td>
+						<span class="backup-name">@entry.name</span>
+						@if entry.has_config
+						<span class="backup-badge">config</span>
+						@end
+					</td>
+					<td class="dash-date">@entry.date_label()</td>
+					<td class="dash-date">@entry.size_label()</td>
+					<td class="dash-date">@entry.media_label()</td>
+					<td class="dash-row-actions">
+						<div class="row-actions">
+							<button class="pure-button backup-restore" type="button" data-dialog="backup-@entry.name"><svg class="icon" aria-hidden="true"><use href="#i-restore"></use></svg>Restore</button>
+						</div>
+					</td>
+				</tr>
+@end
+			</tbody>
+		</table>
+		@else
+		<p class="dash-empty">No backups yet. Use <strong>Back up now</strong> above, turn on automatic backups, or run <code>sh scripts/backup.sh</code> from the project folder.</p>
+		@end
+	</section>
+
+	<p class="backup-hint">Backups live in <code>backups/</code> next to the database. Copy that folder somewhere safe &mdash; a backup on the same disk is not a disaster plan.</p>
+
+@for entry in ctx.backups
+	<dialog class="backup-dialog" id="backup-@entry.name">
+		<form class="pure-form form-stack" method="post" action="/backups/restore">
+			<input type="hidden" name="backup" value="@entry.name">
+
+			<header class="backup-dialog-head">
+				<div>
+					<p class="dash-eyebrow">Restore backup</p>
+					<h2 class="backup-dialog-title">@entry.date_label()</h2>
+				</div>
+				<button class="backup-dialog-close" type="button" data-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg></button>
+			</header>
+
+			<p class="backup-warning"><strong>Restoring this backup erases all current data.</strong> Every post, page, tag, setting and media file is replaced with the copy from @entry.date_label(). Anything written since then is lost, and there is no undo.</p>
+
+			<dl class="backup-facts">
+				<dt>Backup</dt>
+				<dd><code>@entry.name</code></dd>
+				<dt>Size</dt>
+				<dd>@entry.size_label()</dd>
+				<dt>Media</dt>
+				<dd>@entry.media_label()</dd>
+				<dt>Settings</dt>
+				@if entry.has_config
+				<dd>includes <code>config.json</code></dd>
+				@else
+				<dd>database and media only</dd>
+				@end
+			</dl>
+
+			<footer class="backup-dialog-actions">
+				<button class="pure-button" type="button" data-close>Cancel</button>
+				<button class="button-danger pure-button" type="submit"><svg class="icon" aria-hidden="true"><use href="#i-restore"></use></svg>Erase current data and restore</button>
+			</footer>
+		</form>
+	</dialog>
+@end
+
+</main>
+</div>
+
+@include 'footer'

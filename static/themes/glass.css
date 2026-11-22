@@ -1,0 +1,38 @@
+@import url("/themes/_glass.css");
+
+/* Glass: deep navy aurora, wide left rail, sheets of glass. */
+:root {
+	--page-bg: #080d18;
+	--glow-a: rgba(37, 99, 235, 0.38);
+	--glow-b: rgba(168, 85, 247, 0.28);
+	--glow-c: rgba(20, 184, 166, 0.26);
+	--panel: rgba(255, 255, 255, 0.055);
+	--panel-strong: rgba(255, 255, 255, 0.1);
+	--panel-border: rgba(255, 255, 255, 0.14);
+	--hairline: rgba(255, 255, 255, 0.26);
+	--shadow: 0 22px 52px rgba(2, 8, 20, 0.42);
+	--text: #e7edf9;
+	--heading: #ffffff;
+	--muted: #93a2bf;
+	--surface-text: #b6c4de;
+	--link: #bcd4ff;
+	--code-bg: rgba(6, 12, 24, 0.65);
+	--code-text: #dbe6ff;
+	--input-bg: rgba(255, 255, 255, 0.06);
+	--input-text: #f2f6ff;
+	--input-focus-bg: rgba(255, 255, 255, 0.12);
+	--noise: 0.28;
+	--radius: 10px;
+}
+
+.theme-glass .site-title a,
+.theme-glass .view_post_header .post_title {
+	background: linear-gradient(112deg, #ffffff, #c7ddff 46%, #eec8ff);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+
+.theme-glass .post-card:hover {
+	border-color: rgba(255, 255, 255, 0.3);
+}

@@ -1,6 +1,6 @@
 :root {
 	/* Palette variables are overridden by the selected file in static/themes. */
-	--accent: #007711;
+	--accent: #00dddd;
 	--page-bg: #dddddd;
 	--surface: #1f1f1f;
 	--surface-text: #999999;
@@ -138,17 +138,31 @@ h6 {
 .field-input {
 	display: block;
 	width: 100%;
-	padding: 0.55em;
+	padding: 0.55em 0.7em;
 	font: inherit;
 	color: var(--input-text);
 	background: var(--input-bg);
-	border: 1px solid var(--input-focus-bg);
-	border-radius: 4px;
+	border: 1px solid var(--panel-border);
+	border-radius: var(--radius-control, 3px);
 }
 
 .field-textarea {
 	min-height: 10em;
 	resize: vertical;
+}
+
+/* The browser's own file button is the last piece of native chrome in the
+   forms; give it the same box, weight and corner as the text fields. */
+.field-input::file-selector-button {
+	margin-right: 0.7rem;
+	padding: 0.3rem 0.65rem;
+	border: 1px solid var(--panel-border);
+	border-radius: var(--radius-control, 3px);
+	background: var(--panel);
+	color: var(--text);
+	font: inherit;
+	font-size: 0.85rem;
+	cursor: pointer;
 }
 
 .field-row {
@@ -397,6 +411,237 @@ h6 {
 	filter: saturate(1.08);
 }
 
+/* --- IMAGE VIEWER ---
+   Content images open in a modal dialog, built by site.js. `is-zoomable` is
+   only added once that script runs, so without JS images are unchanged. */
+
+.post_content img.is-zoomable {
+	cursor: zoom-in;
+}
+
+body.has-image-viewer {
+	overflow: hidden;
+}
+
+.image-viewer {
+	position: fixed;
+	inset: 0;
+	width: 100%;
+	max-width: none;
+	height: 100%;
+	max-height: none;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	color: #ffffff;
+	overflow: hidden;
+	overscroll-behavior: contain;
+	cursor: zoom-out;
+}
+
+.image-viewer[open] {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.image-viewer::backdrop {
+	background: rgba(8, 10, 14, 0.9);
+	backdrop-filter: blur(6px);
+}
+
+.image-viewer-figure {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.7rem;
+	max-width: 100%;
+	max-height: 100%;
+	margin: 0;
+	padding: clamp(0.85rem, 4vw, 2rem);
+}
+
+.image-viewer-img {
+	display: block;
+	max-width: 100%;
+	max-height: calc(100vh - 8rem);
+	max-height: calc(100dvh - 8rem);
+	width: auto;
+	height: auto;
+	border-radius: var(--radius-sm);
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+}
+
+.image-viewer-caption {
+	max-width: 60ch;
+	color: rgba(255, 255, 255, 0.75);
+	font-size: 0.88rem;
+	line-height: 1.5;
+	text-align: center;
+}
+
+.image-viewer-caption:empty {
+	display: none;
+}
+
+.image-viewer-close,
+.image-viewer-prev,
+.image-viewer-next {
+	position: absolute;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.6rem;
+	height: 2.6rem;
+	padding: 0;
+	border: 1px solid rgba(255, 255, 255, 0.24);
+	border-radius: 50%;
+	background: rgba(20, 22, 28, 0.6);
+	color: #ffffff;
+	cursor: pointer;
+	transition: background 0.2s ease, border-color 0.2s ease;
+	-webkit-tap-highlight-color: transparent;
+}
+
+.image-viewer-close:hover,
+.image-viewer-prev:hover,
+.image-viewer-next:hover {
+	background: rgba(40, 44, 54, 0.85);
+	border-color: rgba(255, 255, 255, 0.5);
+}
+
+.image-viewer-close {
+	top: max(0.9rem, env(safe-area-inset-top));
+	right: max(0.9rem, env(safe-area-inset-right));
+}
+
+.image-viewer-prev,
+.image-viewer-next {
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+.image-viewer-prev {
+	left: 0.7rem;
+}
+
+.image-viewer-next {
+	right: 0.7rem;
+}
+
+.image-viewer .icon {
+	width: 1.05rem;
+	height: 1.05rem;
+}
+
+/* Arrows only make sense when the post has more than one image. */
+.image-viewer.is-single .image-viewer-prev,
+.image-viewer.is-single .image-viewer-next {
+	display: none;
+}
+
+@media (max-width: 34em) {
+	.image-viewer-figure {
+		padding: 3.4rem 0.85rem 0.85rem;
+	}
+
+	.image-viewer-img {
+		max-height: calc(100vh - 9.5rem);
+		max-height: calc(100dvh - 9.5rem);
+	}
+
+	.image-viewer-close,
+	.image-viewer-prev,
+	.image-viewer-next {
+		width: 2.4rem;
+		height: 2.4rem;
+	}
+
+	.image-viewer-close {
+		top: max(0.6rem, env(safe-area-inset-top));
+		right: max(0.6rem, env(safe-area-inset-right));
+	}
+
+	.image-viewer-prev {
+		left: 0.35rem;
+	}
+
+	.image-viewer-next {
+		right: 0.35rem;
+	}
+
+	.image-viewer-caption {
+		font-size: 0.8rem;
+	}
+}
+
+/* Back to top: a glass button pinned to the top-right corner, out of the way
+   until the reader has scrolled past the first screen. Built by site.js, so
+   without JS there is nothing floating over the page. */
+.to-top {
+	position: fixed;
+	top: max(0.9rem, env(safe-area-inset-top));
+	right: max(0.9rem, env(safe-area-inset-right));
+	z-index: 35;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.5rem;
+	height: 2.5rem;
+	padding: 0;
+	border: 1px solid var(--panel-border);
+	border-radius: 50%;
+	background: linear-gradient(160deg, var(--panel-strong), var(--panel));
+	-webkit-backdrop-filter: var(--blur);
+	backdrop-filter: var(--blur);
+	box-shadow: var(--shadow);
+	color: var(--heading);
+	cursor: pointer;
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(-0.4rem);
+	transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease,
+		border-color 0.2s ease;
+	-webkit-tap-highlight-color: transparent;
+}
+
+/* Dashboard pages have a sticky header bar with the logout link in the top
+   right corner, so the button hangs below that bar instead of next to it. */
+body:has(.dash-nav) .to-top {
+	top: calc(4.75rem + env(safe-area-inset-top));
+}
+
+/* The admin menu grows taller than the bar while it is open on narrow
+   screens, so the button steps aside until it closes again. */
+body:has(.dash-nav.is-open) .to-top {
+	display: none;
+}
+
+.to-top.is-visible {
+	opacity: 1;
+	visibility: visible;
+	transform: none;
+}
+
+.to-top:hover,
+.to-top:focus-visible {
+	border-color: var(--hairline);
+	color: var(--link);
+}
+
+.to-top .icon {
+	width: 1.15rem;
+	height: 1.15rem;
+}
+
+@media (max-width: 34em) {
+	.to-top {
+		width: 2.6rem;
+		height: 2.6rem;
+	}
+}
+
 /* Short textarea used by the footer setting. */
 .footer-input {
 	min-height: 5.5em;
@@ -468,6 +713,7 @@ h6 {
 	position: absolute;
 	top: 50%;
 	left: 0.75rem;
+	z-index: 1;
 	width: 1rem;
 	height: 1rem;
 	transform: translateY(-50%);
@@ -475,9 +721,6 @@ h6 {
 	pointer-events: none;
 }
 
-.site-search .search_box {
-	padding-left: 2.3rem;
-}
 
 .site-nav {
 	display: flex;

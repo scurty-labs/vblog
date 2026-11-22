@@ -1,0 +1,40 @@
+@include 'header'
+
+@include 'admin_bar'
+
+<div class="site-shell">
+
+@include 'sidebar'
+
+<main class="site-main content">
+
+<article class="post-single page-single">
+
+<header class="post-hero view_post_header reveal">
+
+<p class="page-kicker">Page</p>
+<h1 class="post-title post_title">@page_item.title</h1>
+<div class="post-meta post_meta">
+	<time datetime="@ctx.post_date(page_item)">@ctx.post_date(page_item)</time>
+	<span class="post-reading"><svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg>@page_item.reading_time() min read</span>
+</div>
+@if ctx.is_admin
+<div class="post-actions post_actions view-post-actions">
+	<a class="pure-button" href="/edit/page/@page_item.id"><svg class="icon" aria-hidden="true"><use href="#i-edit"></use></svg>Edit page</a>
+	<a class="pure-button button-error" href="/delete/page/@page_item.id" onclick="return confirm('Delete this page?')"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg>Delete page</a>
+</div>
+@end
+
+</header>
+
+<div class="post-body view_post_content">
+	<div class="post-content post_content">@{ ctx.as_html(page_item.body) }</div>
+</div>
+
+</article>
+
+</main>
+
+</div>
+
+@include 'footer'

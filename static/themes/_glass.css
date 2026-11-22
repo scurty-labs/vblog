@@ -10,6 +10,8 @@
 :root {
 	--radius: 10px;
 	--radius-sm: 6px;
+	/* Form controls sit tighter than the panels they live in. */
+	--radius-control: 3px;
 	--rail: 17.5rem;
 	--blur: blur(20px) saturate(150%);
 	--shadow: 0 20px 48px rgba(0, 0, 0, 0.32);
@@ -34,6 +36,57 @@
 	--input-bg: rgba(255, 255, 255, 0.06);
 	--input-text: #f2f6ff;
 	--input-focus-bg: rgba(255, 255, 255, 0.12);
+}
+
+/* Scrollbars: slim, translucent and tinted from the theme's own accent instead
+   of the operating system's chrome. Chromium and Safari get the rounded, inset
+   thumb through the ::-webkit-scrollbar pseudo-elements; Firefox, which has no
+   such pseudo-elements, gets the closest match from the standard properties.
+   The `@supports not` guard keeps the standard properties from overriding the
+   pseudo-elements in browsers that understand both. */
+::-webkit-scrollbar {
+	width: 0.7rem;
+	height: 0.7rem;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	border: 3px solid transparent;
+	border-radius: 999px;
+	background: color-mix(in srgb, var(--accent) 40%, transparent);
+	background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: color-mix(in srgb, var(--accent) 62%, transparent);
+	background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:active {
+	background: color-mix(in srgb, var(--accent) 82%, transparent);
+	background-clip: content-box;
+}
+
+::-webkit-scrollbar-corner {
+	background: transparent;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+	:root {
+		scrollbar-width: thin;
+		scrollbar-color: color-mix(in srgb, var(--accent) 45%, transparent) transparent;
+	}
+}
+
+/* Panes inside the glass (the pager's pop-up menu, code blocks) wear a
+   narrower bar, so it reads as part of the pane rather than a rail beside it. */
+.pagination.is-enhanced .page_list::-webkit-scrollbar,
+.post_content pre::-webkit-scrollbar {
+	width: 0.55rem;
+	height: 0.55rem;
 }
 
 html {
@@ -172,6 +225,23 @@ body::after {
 	margin: 0;
 }
 
+/* Optional logo: sits under the blog title, whatever the theme's type, and
+   is centred in the rail (and in the stacked phone header). */
+.site-logo {
+	margin: 0 0 1.25rem;
+	text-align: center;
+}
+
+.site-logo img {
+	display: block;
+	width: auto;
+	max-width: 100%;
+	max-height: 6rem;
+	height: auto;
+	margin-inline: auto;
+	object-fit: contain;
+}
+
 .site-search {
 	margin: 0;
 	padding: 0;
@@ -185,14 +255,17 @@ body::after {
 	color: var(--input-text);
 	background: var(--input-bg);
 	border: 1px solid var(--panel-border);
-	border-radius: var(--radius-sm);
+	border-radius: var(--radius-control);
 	-webkit-backdrop-filter: blur(10px);
 	backdrop-filter: blur(10px);
 	transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-.site-search .search_box::placeholder {
-	color: var(--muted);
+.site-search .search_box::placeholder,
+.site-search input::placeholder {
+	color: color-mix(in srgb, var(--muted) 85%, transparent);
+	opacity: 1;
+	text-overflow: ellipsis;
 }
 
 .site-search .search_box:focus {
@@ -295,6 +368,9 @@ body::after {
 
 .post-list {
 	display: grid;
+	/* minmax(0, 1fr) lets the column shrink below a wide code block or table,
+	   which would otherwise push the whole post past a phone's viewport. */
+	grid-template-columns: minmax(0, 1fr);
 	gap: 1.15rem;
 	max-width: 78rem;
 	margin: 0;
@@ -302,6 +378,7 @@ body::after {
 }
 
 .blog_post {
+	min-width: 0;
 	margin: 0;
 }
 
@@ -595,12 +672,19 @@ body::after {
 /* --- PAGINATION / SEARCH --- */
 
 /* Pagination floats in the bottom-right corner and stays there while the
-   page scrolls, so it never wanders off-screen on long archives. The numbers
-   sit bare on the page: no pill, no boxes, just links coloured by the theme. */
+   page scrolls, so it never wanders off-screen on long archives. Each number
+   is a small frosted pill and the current page is filled with the site's
+   accent. The numbers fold into a pop-up menu above the toggle so they never
+   cover the article; see the combo-box rules below and the 34em block at the
+   end for the phone corner. */
 .pagination {
 	position: sticky;
 	bottom: 0.2rem;
 	z-index: 25;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 0.4rem;
 	width: fit-content;
 	margin: auto 0 0 auto;
 	text-align: right;
@@ -611,51 +695,198 @@ body:has(.admin-bar) .pagination {
 	bottom: 4.2rem;
 }
 
-.page_list {
+/* Scoped to .pagination so it outranks pure's `.pure-menu-horizontal
+   .pure-menu-list` rule that would make the list inline-block. */
+.pagination .page_list {
 	display: flex;
 	flex-wrap: wrap;
-	align-items: baseline;
+	align-items: center;
 	justify-content: flex-end;
-	gap: 0.1rem;
-	font-size: 0.88rem;
-	letter-spacing: 0.01em;
+	gap: 0.35rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
 }
 
 .page-link {
-	display: inline-block;
-	min-width: 1.6rem;
-	padding: 0.25rem 0.45rem;
-	color: var(--muted);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 2.35rem;
+	height: 2.35rem;
+	padding: 0 0.6rem;
+	border: 1px solid var(--panel-border);
+	border-radius: var(--radius-sm);
+	background: linear-gradient(160deg, var(--panel-strong), var(--panel));
+	-webkit-backdrop-filter: var(--blur);
+	backdrop-filter: var(--blur);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 6px 16px rgba(0, 0, 0, 0.18);
+	color: var(--surface-text);
+	font-size: 0.98rem;
+	font-weight: 600;
+	line-height: 1;
 	text-align: center;
 	text-decoration: none;
 	font-variant-numeric: tabular-nums;
-	text-shadow: 0 0 6px var(--page-bg), 0 0 12px var(--page-bg);
-	transition: color 0.2s ease;
+	transition: color 0.18s ease, background 0.18s ease, border-color 0.18s ease,
+		transform 0.18s ease, box-shadow 0.18s ease;
 }
 
 .page-link:hover,
-.page-link:focus,
-.page-link.is-current {
-	color: var(--link);
+.page-link:focus-visible {
+	border-color: var(--hairline);
+	background: linear-gradient(160deg, var(--panel-strong), var(--panel-strong));
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 10px 22px rgba(0, 0, 0, 0.24);
+	color: var(--heading);
+	transform: translateY(-2px);
 }
 
-.page-link:hover,
-.page-link:focus {
-	text-decoration: underline;
-	text-decoration-thickness: 1px;
-	text-underline-offset: 0.3rem;
-}
-
-.page-link.is-current {
+/* One filled shape marks where you are, which reads at a glance even when
+   the archive runs to a long row of numbers. */
+.page-link.is-current,
+.page-link.is-current:hover,
+.page-link.is-current:focus-visible {
+	border-color: color-mix(in srgb, var(--accent) 62%, transparent);
+	background: color-mix(in srgb, var(--accent) 82%, transparent);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28),
+		0 8px 20px color-mix(in srgb, var(--accent) 26%, transparent);
+	color: var(--on-accent);
 	font-weight: 700;
-	text-decoration: underline;
-	text-decoration-thickness: 2px;
-	text-underline-offset: 0.3rem;
+	transform: none;
+}
+
+/* The pager is a combo box at every width: the numbers fold into a pop-up
+   menu behind a "Page N of M" toggle, so a long archive never covers part of
+   the article. site.js creates the toggle and adds `is-enhanced`; without JS
+   the plain row of pills stays visible and the pager keeps working. */
+.pager-toggle {
+	display: none;
+}
+
+/* Sized and shaded like the admin dock's buttons so the corners read as a
+   pair. */
+.pagination.is-enhanced .pager-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	min-height: 2.9rem;
+	padding: 0 0.95rem;
+	border: 1px solid var(--panel-border);
+	border-radius: var(--radius-sm);
+	background: var(--panel);
+	-webkit-backdrop-filter: var(--blur);
+	backdrop-filter: var(--blur);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 8px 20px rgba(0, 0, 0, 0.22);
+	color: var(--heading);
+	font-family: inherit;
+	font-size: 0.9rem;
+	font-weight: 600;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.pagination.is-enhanced.is-open .pager-toggle,
+.pagination.is-enhanced .pager-toggle:hover,
+.pagination.is-enhanced .pager-toggle:focus-visible {
+	border-color: var(--hairline);
+	background: var(--panel-strong);
+}
+
+.pagination.is-enhanced .pager-caret {
+	width: 0.85rem;
+	height: 0.85rem;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	transition: transform 0.18s ease;
+}
+
+.pagination.is-enhanced.is-open .pager-caret {
+	transform: rotate(180deg);
+}
+
+/* The same glass frame the phone version wears, so the combo box reads the
+   same at every width; only its corner changes. */
+.pagination.is-enhanced {
+	padding: 0.35rem;
+	border: 1px solid var(--panel-border);
+	border-radius: var(--radius);
+	background: color-mix(in srgb, var(--page-bg) 55%, transparent);
+	-webkit-backdrop-filter: var(--blur);
+	backdrop-filter: var(--blur);
+	box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+/* The numbers open as a column above the toggle, hugging its right edge on
+   desktop; a long archive scrolls inside the menu instead of running off the
+   side of the screen. */
+.pagination.is-enhanced .page_list {
+	position: absolute;
+	right: 0;
+	bottom: calc(100% + 0.15rem);
+	z-index: 30;
+	display: none;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	align-items: stretch;
+	justify-content: flex-start;
+	gap: 0.3rem;
+	width: max-content;
+	min-width: 100%;
+	max-width: min(17rem, calc(100vw - 2rem));
+	max-height: min(60vh, 24rem);
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	margin: 0;
+	padding: 0.55rem;
+	border: 1px solid var(--panel-border);
+	border-radius: var(--radius);
+	background:
+		linear-gradient(118deg, rgba(255, 255, 255, 0.12), transparent 45%),
+		linear-gradient(160deg, var(--panel-strong), var(--panel));
+	-webkit-backdrop-filter: var(--blur);
+	backdrop-filter: var(--blur);
+	box-shadow: var(--shadow);
+}
+
+.pagination.is-enhanced.is-open .page_list {
+	display: flex;
+}
+
+.pagination.is-enhanced .page-link {
+	width: 100%;
+	min-width: 2.5rem;
+	height: 2.5rem;
+	font-size: 1rem;
+}
+
+/* The ellipsis standing in for the pages a long archive skips. It keeps a
+   pill's footprint so the row still lines up, without pretending to be a link. */
+.page-gap-mark {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 2.35rem;
+	height: 2.35rem;
+	padding: 0 0.35rem;
+	color: var(--muted);
+	font-size: 0.98rem;
+	line-height: 1;
+	font-variant-numeric: tabular-nums;
+}
+
+.pagination.is-enhanced .page-gap-mark {
+	width: 100%;
+	min-width: 2.5rem;
+	height: 2.5rem;
+	font-size: 1rem;
 }
 
 /* The pager borrows each theme's own voice: the editorial themes set it like
-   printed folios, neon lets the current number glow, and the frost themes keep
-   plain sans numerals. Colours always come from that theme's link hue. */
+   printed folios, neon lets the current page glow, and the frost themes keep
+   plain sans numerals. Colours always come from that theme's tokens. */
 .theme-noir .page_list,
 .theme-sepia .page_list {
 	font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
@@ -663,9 +894,14 @@ body:has(.admin-bar) .pagination {
 
 .theme-noir .page_list,
 .theme-neon .page_list {
-	font-size: 0.76rem;
-	letter-spacing: 0.16em;
+	font-size: 0.82rem;
+	letter-spacing: 0.14em;
 	text-transform: uppercase;
+}
+
+.theme-noir .page-link,
+.theme-neon .page-link {
+	font-weight: 500;
 }
 
 .theme-sepia .page-link {
@@ -673,23 +909,53 @@ body:has(.admin-bar) .pagination {
 	font-variant-numeric: oldstyle-nums;
 }
 
-.theme-noir .page-link:hover,
-.theme-noir .page-link:focus,
-.theme-noir .page-link.is-current {
-	color: var(--heading);
-}
-
-.theme-neon .page-link:hover,
-.theme-neon .page-link:focus {
-	text-shadow: 0 0 12px color-mix(in srgb, var(--link) 60%, transparent);
-}
-
 .theme-neon .page-link.is-current {
-	text-decoration-style: dotted;
-	text-decoration-thickness: 2px;
-	text-shadow: 0 0 16px color-mix(in srgb, var(--link) 70%, transparent);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28),
+		0 0 18px color-mix(in srgb, var(--accent) 55%, transparent);
 }
 
+/* Phones pin the combo box in the bottom-left corner as a glass frame with
+   the same padding, radius and shading as the admin dock in the bottom-
+   right corner, so the two read as a pair. */
+@media (max-width: 34em) {
+	.pagination {
+		align-items: flex-start;
+		width: 100%;
+		margin: auto auto 0 0;
+		text-align: left;
+	}
+
+	.pagination.is-enhanced {
+		position: fixed;
+		left: max(0.75rem, env(safe-area-inset-left));
+		right: auto;
+		bottom: calc(0.75rem + env(safe-area-inset-bottom));
+		z-index: 40;
+		width: auto;
+		max-width: calc(100vw - 2.5rem);
+		margin: 0;
+	}
+
+	/* The admin dock is a corner button too now, so the pager keeps the same
+	   line instead of stepping up out of its way. */
+	body:has(.admin-bar) .pagination.is-enhanced {
+		bottom: calc(0.75rem + env(safe-area-inset-bottom));
+	}
+
+	/* Without JS the numbers stay in flow: let them wrap instead of running
+	   off the screen. */
+	.pagination .page_list {
+		flex-wrap: wrap;
+		justify-content: flex-start;
+		max-width: 100%;
+	}
+
+	/* The pop-up opens from the left edge of the frame on phones. */
+	.pagination.is-enhanced .page_list {
+		left: 0;
+		right: auto;
+	}
+}
 .page-indicator,
 .search-heading {
 	color: var(--muted);
@@ -715,7 +981,7 @@ body:has(.admin-bar) .pagination {
 	color: var(--text);
 	background: var(--panel);
 	border: 1px solid var(--panel-border);
-	border-radius: var(--radius-sm);
+	border-radius: var(--radius-control);
 	text-decoration: none;
 	text-shadow: none;
 	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
@@ -818,30 +1084,189 @@ body:has(.admin-bar) {
 	text-transform: uppercase;
 }
 
-.field-input {
-	padding: 0.65rem 0.8rem;
+/* pure's form styles carry an element and an attribute per control, which is
+   heavier than a single class. Restated at the same weight, or its grey #ccc
+   border, inset #ddd shadow, 4px radius and #129fea focus ring paint over the
+   theme on every form in the admin. */
+.field-input,
+.pure-form :is(input, textarea, select).field-input,
+.pure-form input.search_box {
+	padding: 0.6rem 0.7rem;
 	color: var(--input-text);
-	background: var(--input-bg);
+	background-color: var(--input-bg);
 	border: 1px solid var(--panel-border);
-	border-radius: var(--radius-sm);
+	border-radius: var(--radius-control);
+	box-shadow: none;
 	-webkit-backdrop-filter: blur(10px);
 	backdrop-filter: blur(10px);
-	transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+	transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-.field-input:focus {
+.field-input::placeholder,
+.field-textarea::placeholder,
+.site-search input::placeholder {
+	color: color-mix(in srgb, var(--muted) 85%, transparent);
+	opacity: 1;
+	text-overflow: ellipsis;
+}
+
+.field-input:hover,
+.pure-form :is(input, textarea, select).field-input:hover,
+.pure-form input.search_box:hover {
+	border-color: var(--hairline);
+}
+
+.field-input:focus,
+.field-input:focus-visible,
+.pure-form :is(input, textarea, select).field-input:focus,
+.pure-form :is(input, textarea, select).field-input:focus-visible,
+.pure-form input.search_box:focus,
+.pure-form input.search_box:focus-visible {
 	outline: none;
-	background: var(--input-focus-bg);
+	background-color: var(--input-focus-bg);
 	border-color: var(--accent);
 	box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
 }
 
+/* The magnifier owns the left lane of a search field. This outranks the shared
+   control padding above, so a placeholder can never sit under the icon. */
+.search-field :is(input, .field-input, .search_box),
+.pure-form .search-field :is(input, .field-input, .search_box) {
+	padding-left: 2.4rem;
+}
+
+/* Keyboard focus gets the accent ring buttons already lift for the mouse. */
+.pure-button:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+/* --- TOASTS --- */
+
+/* Save confirmations and the "it's live" announcement: a small glass card in
+   the corner that site.js reveals, pauses while hovered or focused, and
+   dismisses after a few seconds. */
+.toast-stack {
+	position: fixed;
+	right: max(0.9rem, env(safe-area-inset-right));
+	bottom: calc(0.9rem + env(safe-area-inset-bottom));
+	z-index: 60;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	width: min(22rem, calc(100vw - 2rem));
+	pointer-events: none;
+}
+
+.toast {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.55rem;
+	padding: 0.7rem 0.6rem 0.7rem 0.85rem;
+	border: 1px solid var(--panel-border);
+	border-left: 3px solid var(--accent);
+	border-radius: var(--radius-sm);
+	background:
+		linear-gradient(118deg, rgba(255, 255, 255, 0.12), transparent 45%),
+		linear-gradient(160deg, var(--panel-strong), var(--panel));
+	-webkit-backdrop-filter: var(--blur);
+	backdrop-filter: var(--blur);
+	box-shadow: var(--shadow);
+	color: var(--text);
+	font-size: 0.86rem;
+	line-height: 1.45;
+	pointer-events: auto;
+	transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+/* Visible by default: a stale, blocked or broken script must not be able to
+   swallow the confirmation. site.js marks the stack `is-wired` and only then
+   does a toast start hidden, so it can animate in when `is-visible` is added. */
+.toast-stack.is-wired .toast {
+	opacity: 0;
+	transform: translateY(0.5rem);
+}
+
+.toast-stack.is-wired .toast.is-visible {
+	opacity: 1;
+	transform: none;
+}
+
+.toast > .icon {
+	flex: 0 0 auto;
+	margin-top: 0.12rem;
+	color: var(--accent);
+}
+
+.toast-info {
+	border-left-color: #e3a72f;
+}
+
+.toast-info > .icon {
+	color: #e3a72f;
+}
+
+.toast-text {
+	margin: 0;
+	min-width: 0;
+}
+
+.toast-text a {
+	color: var(--link);
+	text-decoration: underline;
+}
+
+.toast-close {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.6rem;
+	height: 1.6rem;
+	margin-left: auto;
+	padding: 0;
+	border: 0;
+	border-radius: var(--radius-control);
+	background: none;
+	color: var(--muted);
+	cursor: pointer;
+}
+
+.toast-close:hover,
+.toast-close:focus-visible {
+	outline: none;
+	background: var(--panel-strong);
+	color: var(--heading);
+}
+
+/* Phones: full width, lifted above the admin dock so the two never overlap. */
+@media (max-width: 34em) {
+	.toast-stack {
+		left: max(0.75rem, env(safe-area-inset-left));
+		right: max(0.75rem, env(safe-area-inset-right));
+		bottom: calc(4.4rem + env(safe-area-inset-bottom));
+		width: auto;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.toast {
+		transition: none;
+		transform: none;
+	}
+}
+
 /* Native selects ignore the theme until they are opened, so draw the control
-   ourselves and theme both the closed box and its option list. */
-.field-select {
+   ourselves and theme both the closed box and its option list. The padding is
+   restated at the shared control rule's weight: that rule is heavier than one
+   class, and its shorthand would otherwise wipe the room reserved for the
+   caret, leaving the arrow drawn over the end of the label. */
+.field-select,
+.pure-form :is(input, select).field-select {
 	appearance: none;
 	-webkit-appearance: none;
-	padding-right: 2.35rem;
+	padding: 0.55rem 2.35rem 0.55rem 0.7rem;
+	line-height: 1.4;
+	text-overflow: ellipsis;
 	cursor: pointer;
 	background-color: var(--input-bg);
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5l5-5' fill='none' stroke='%236b7c98' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -850,10 +1275,53 @@ body:has(.admin-bar) {
 	background-size: 0.75rem;
 }
 
+/* pure's `.pure-form select` is heavier than `.field-select`, so it would paint
+   the box white under our light text. Restate the theme's colours at its
+   weight. */
+.pure-form .field-select {
+	color: var(--input-text);
+	background-color: var(--input-bg);
+}
+
+/* The option rows are drawn by the browser's own pop-up, but they inherit the
+   font from here; the open line-height keeps descenders (g, p, y) whole in
+   the list as well as on the closed control. */
 .field-select option {
 	color: var(--text);
 	background-color: var(--page-bg);
+	line-height: 1.6;
+	padding: 0.25rem 0.4rem;
 }
+
+/* Settings are grouped into sections so related switches read as one block. */
+.form-section {
+	margin: 0 0 1.75rem;
+	padding: 0 0 1.5rem;
+	border-bottom: 1px solid var(--panel-border);
+}
+
+.form-section:last-of-type {
+	margin-bottom: 1rem;
+	padding-bottom: 0;
+	border-bottom: 0;
+}
+
+.form-section-title {
+	margin: 0 0 0.25rem;
+	color: var(--heading);
+	font-size: 1.05rem;
+	font-weight: 700;
+	letter-spacing: -0.01em;
+}
+
+.form-section-hint {
+	margin: 0 0 1rem;
+	color: var(--muted);
+	font-size: 0.85rem;
+	line-height: 1.5;
+}
+
+/* Switch rows live in admin.css, so every theme draws them, not just this one. */
 
 .form-error {
 	padding: 0.65rem 0.9rem;
@@ -948,6 +1416,14 @@ body:has(.admin-bar) {
 		margin: 0;
 	}
 
+	/* The header stacks on phones, so the logo takes a row of its own under
+	   the title (it is already centred by the base rule). */
+	.js .site-brand .site-logo {
+		order: 3;
+		flex: 1 1 100%;
+		margin: 0;
+	}
+
 	.js .site-brand .site-description {
 		order: 3;
 		flex: 1 1 100%;
@@ -980,15 +1456,44 @@ body:has(.admin-bar) {
 		flex: 1 1 auto;
 	}
 
+	/* On phones the dock shrinks to a single icon button in the corner, and
+	   its menu rises out of it as a vertical stack of icon buttons. */
 	.admin-bar {
-		left: 0.75rem;
-		right: 0.75rem;
-		bottom: 0.75rem;
+		left: auto;
+		right: max(0.75rem, env(safe-area-inset-right));
+		bottom: calc(0.75rem + env(safe-area-inset-bottom));
 		transform: none;
 	}
 
 	.js .admin-bar {
-		justify-content: flex-start;
+		flex-direction: column-reverse;
+		flex-wrap: nowrap;
+		align-items: stretch;
+		gap: 0.35rem;
+		padding: 0.35rem;
+	}
+
+	.js .admin-bar .pure-button {
+		justify-content: center;
+		width: 2.9rem;
+		height: 2.9rem;
+		padding: 0;
+		font-size: 1.05rem;
+	}
+
+	/* Labels stay in the markup for screen readers and keyboard users; the
+	   bar itself shows only the icons. */
+	.js .admin-bar .admin-bar-label {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		margin: -1px;
+		padding: 0;
+		overflow: hidden;
+		clip: rect(0 0 0 0);
+		clip-path: inset(50%);
+		white-space: nowrap;
+		border: 0;
 	}
 
 	.js .admin-bar-toggle {
@@ -1000,13 +1505,14 @@ body:has(.admin-bar) {
 		display: none;
 	}
 
-	.pagination {
-		bottom: 0.15rem;
+	.js .admin-bar.is-open > .pure-button:not(.admin-bar-toggle) {
+		display: inline-flex;
+		animation: admin-rise 0.2s ease-out both;
 	}
 
-	body:has(.admin-bar) .pagination {
-		bottom: 4.05rem;
-	}
+	/* The pager's phone offsets live with the pager rules earlier in this
+	   file; the admin dock sits in the opposite corner, so it needs no
+	   clearance. */
 }
 
 /* Readable without backdrop-filter support. */
@@ -1030,9 +1536,26 @@ body:has(.admin-bar) {
 	}
 }
 
+/* The phone admin menu rises into place out of the bar. */
+@keyframes admin-rise {
+	from {
+		opacity: 0;
+		transform: translateY(0.6rem);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
 @media (prefers-reduced-motion: reduce) {
 	body::before,
 	.view_post_header::before {
+		animation: none;
+	}
+
+	.js .admin-bar.is-open > .pure-button:not(.admin-bar-toggle) {
 		animation: none;
 	}
 

@@ -47,10 +47,15 @@ body.theme-neon {
 
 .theme-neon .post-meta,
 .theme-neon .field-label,
-.theme-neon .stat-label,
-.theme-neon .site-description {
+.theme-neon .stat-label {
 	text-transform: uppercase;
 	letter-spacing: 0.18em;
+}
+
+/* The description is written in Settings, so it keeps the capitals and lower
+   case the author typed; only the tracking follows the theme. */
+.theme-neon .site-description {
+	letter-spacing: 0.06em;
 }
 
 .theme-neon .post-card:hover {

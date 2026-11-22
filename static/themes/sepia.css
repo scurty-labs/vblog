@@ -1,15 +1,42 @@
-/* Sepia: warm paper page with brown surfaces. */
+@import url("/themes/_glass.css");
+
+/* Sepia: warm paper, flush-left rail, serif editorial type. */
 :root {
-	--page-bg: #f4ecd8;
-	--surface: #4a3f35;
-	--surface-text: #d8cbb8;
-	--heading: #fff7e6;
-	--text: #3b3229;
-	--muted: #8a7a66;
-	--link-muted: #8a7a66;
-	--code-bg: #e6dcc3;
+	--page-bg: #f6efdd;
+	--glow-a: rgba(217, 119, 6, 0.24);
+	--glow-b: rgba(180, 83, 9, 0.16);
+	--glow-c: rgba(120, 113, 108, 0.14);
+	--panel: rgba(255, 251, 240, 0.58);
+	--panel-strong: rgba(255, 253, 247, 0.82);
+	--panel-border: rgba(74, 63, 53, 0.18);
+	--hairline: rgba(74, 63, 53, 0.3);
+	--shadow: 0 16px 34px rgba(74, 63, 53, 0.14);
+	--text: #3c332a;
+	--heading: #2a231c;
+	--muted: #7d6e5c;
+	--surface-text: #4a3f35;
+	--link: #8a4b0f;
+	--code-bg: rgba(236, 226, 204, 0.9);
 	--code-text: #4a3f35;
-	--input-bg: #5c4f42;
-	--input-text: #fff7e6;
-	--input-focus-bg: #6b5c4d;
+	--input-bg: rgba(255, 252, 244, 0.72);
+	--input-text: #2a231c;
+	--input-focus-bg: #fffdf7;
+	--noise: 0.14;
+	--radius: 6px;
+}
+
+.theme-sepia .site-title,
+.theme-sepia .post_title,
+.theme-sepia .view_post_header .post_title,
+.theme-sepia .dash-title {
+	font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+	letter-spacing: -0.01em;
+}
+
+.theme-sepia .site-title {
+	font-size: 1.6rem;
+}
+
+.theme-sepia .post_content {
+	font-size: 1.03rem;
 }

@@ -23,15 +23,15 @@
 	<form class="dash-panel pure-form editor-form" method="post" action="/save/post/@post.id">
 		<div class="field editor-title-field">
 			<label class="field-label" for="post_title">Title</label>
-			<input class="field-input editor-title-input" id="post_title" type="text" name="post_title" value="@post.title" autofocus>
+			<input class="field-input editor-title-input" id="post_title" type="text" name="post_title" value="@post.title" autocomplete="off" autofocus>
 		</div>
 		<div class="field">
 			<label class="field-label" for="post_tags">Tags <span class="editor-hint">comma separated, e.g. notes, v-lang</span></label>
-			<input class="field-input" id="post_tags" type="text" name="post_tags" value="@post.tags" placeholder="notes, v-lang, tutorials">
+			<input class="field-input" id="post_tags" type="text" name="post_tags" value="@post.tags" placeholder="notes, v-lang, tutorials" autocomplete="off">
 		</div>
 		<div class="field editor-body-field">
 			<span class="field-label">Body <span class="editor-hint">Markdown &middot; preview on the right</span></span>
-			<textarea class="field-input field-textarea" name="post_body" data-markdown>@post.body</textarea>
+			<textarea class="field-input field-textarea" name="post_body" data-markdown autocomplete="off">@post.body</textarea>
 		</div>
 		<div class="field-row editor-meta-row">
 			<label class="field">
@@ -50,7 +50,7 @@
 			</label>
 			<label class="field">
 				<span class="field-label">Publish at <span class="editor-hint">optional, future dates schedule it</span></span>
-				<input class="field-input" type="datetime-local" name="publish_at" value="@post.publish_at_input()">
+				<input class="field-input" type="datetime-local" name="publish_at" value="@ctx.publish_input(post)" autocomplete="off">
 			</label>
 		</div>
 		<footer class="editor-actions">

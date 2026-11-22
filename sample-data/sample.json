@@ -1,0 +1,49 @@
+{
+	"posts": [
+		{
+			"file": "posts/welcome-to-vblog.md",
+			"title": "Welcome to vblog",
+			"tags": "welcome, vblog, demo",
+			"days_ago": 1
+		},
+		{
+			"file": "posts/markdown-tour.md",
+			"title": "A tour of Markdown",
+			"tags": "markdown, writing, guide",
+			"days_ago": 2
+		},
+		{
+			"file": "posts/public-domain-pictures.md",
+			"title": "Pictures you can actually use",
+			"tags": "images, media, art",
+			"days_ago": 4
+		},
+		{
+			"file": "posts/drafts-tags-and-scheduling.md",
+			"title": "Drafts, tags and scheduling",
+			"tags": "workflow, admin, demo",
+			"days_ago": 7
+		}
+	],
+	"pages": [
+		{
+			"file": "pages/about.md",
+			"title": "About",
+			"tags": "",
+			"days_ago": 10
+		},
+		{
+			"file": "pages/colophon.md",
+			"title": "Colophon",
+			"tags": "",
+			"days_ago": 10
+		}
+	],
+	"images": [
+		"images/earth-from-apollo-17.jpg",
+		"images/great-wave.jpg",
+		"images/starry-night.jpg",
+		"images/annapurna-panorama.jpg",
+		"images/jacques-cartier-lake.jpg"
+	]
+}

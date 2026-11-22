@@ -1,15 +1,29 @@
 module main
 
 import veb
-import crypto.md5
+import time
 
 pub fn (mut app App) admin(mut ctx Context) veb.Result {
 	app.prepare(mut ctx)
+	filter := ctx.query['status'] or { 'all' }
+	ctx.admin_filter = if filter in ['published', 'draft', 'scheduled'] { filter } else { 'all' }
 	if ctx.is_admin {
-		return app.r_home(mut ctx)
+		ctx.posts_count = app.get_posts_count()
+		ctx.page_count = ctx.pages.len
+		ctx.draft_count = app.get_draft_count()
+		ctx.scheduled_count = app.get_scheduled_count()
+		ctx.recent_posts = app.get_admin_posts(ctx.admin_filter, 50)
+		ctx.scheduled_watch = app.get_scheduled_posts(5)
+		ctx.server_now = time.now().unix()
+		ctx.page_title = 'Dashboard — ${ctx.settings.blog_title}'
 	}
 	invalid := ctx.invalid_userpass
 	return $veb.html()
+}
+
+// filter_class marks the active dashboard status filter.
+pub fn (ctx &Context) filter_class(name string) string {
+	return if ctx.admin_filter == name { 'dash-filter is-active' } else { 'dash-filter' }
 }
 
 pub fn (mut app App) r_home(mut ctx Context) veb.Result {
@@ -17,7 +31,7 @@ pub fn (mut app App) r_home(mut ctx Context) veb.Result {
 }
 
 pub fn (mut app App) logout(mut ctx Context) veb.Result {
-	if app.auth(ctx) {
+	if app.auth(ctx) && same_site_request(ctx) {
 		app.set_login_token(mut ctx, '')
 	}
 	return app.r_home(mut ctx)
@@ -29,63 +43,45 @@ pub fn (mut app App) settings(mut ctx Context) veb.Result {
 		return app.r_home(mut ctx)
 	}
 	ctx.themes = available_themes()
+	ctx.timezones = available_timezones()
+	// A zone written outside the list still needs an option to sit on.
+	if ctx.settings.timezone !in ctx.timezones {
+		ctx.timezones.insert(0, ctx.settings.timezone)
+	}
+	ctx.page_title = 'Settings — ${ctx.settings.blog_title}'
 	return $veb.html()
 }
 
-@[post]
 @['/auth_login']
+@[post]
 pub fn (mut app App) auth_login(mut ctx Context) veb.Result {
+	// A login form posted from another site would sign the admin into the
+	// attacker's session, so only accept the form from this site.
+	if !same_site_request(ctx) {
+		return app.r_home(mut ctx)
+	}
 
-	//println('entering login authentication')
-
-	app.config = load_config()
+	conf := load_config()
+	app.config = conf
 
 	form_username := ctx.form['username'] or { '' }
 	form_password := ctx.form['password'] or { '' }
 
-	// Validate form data
 	if form_username == '' || form_password == '' {
 		ctx.invalid_userpass = true
-		//println('invalid form data valid')
 	} else {
-
-		// Does form data match config?
-		salt := app.config.client_salt
-		secret := app.config.client_secret
-		username := app.config.admin_username
-		password := app.config.admin_password
-		email := app.config.admin_email
-
-		//println(app.config.admin_username + ' ' + form_username)
-
-		// Check username
-		if form_username == username {
-
-			//println('username valid')
-
-			// Validate password with client salt and client secret
-			password_hash := md5.sum('${salt}${password}${secret}'.bytes()).hex()
-			form_password_hash := md5.sum('${salt}${form_password}${secret}'.bytes()).hex()
-
-			if form_password_hash == password_hash {
-
-				auth_token := md5.sum('${salt}${password}${username}${email}${secret}'.bytes()).hex()
-				app.set_login_token(mut ctx, auth_token)
-
-				ctx.is_admin = true
-				//println('login successful')
-
-			} else {
-				//println('password is invalid')
-				ctx.invalid_userpass = true
-			}
-
+		username_ok := identity_matches(conf.admin_username, hash_identity(form_username,
+			conf.client_secret))
+		// The password is checked even when the username is wrong, so a failed
+		// sign-in costs the same either way and never says which field was wrong.
+		password_ok := verify_password(conf.admin_password, form_password)
+		if username_ok && password_ok {
+			app.set_login_token(mut ctx, session_token(conf))
+			ctx.is_admin = true
 		} else {
 			ctx.invalid_userpass = true
-			//println('invalid username')
 		}
-
 	}
 
-	return ctx.redirect('/')
+	return ctx.redirect('/admin')
 }

@@ -22,11 +22,11 @@
 	<form class="dash-panel pure-form editor-form" method="post" action="/create/page">
 		<div class="field editor-title-field">
 			<label class="field-label" for="page_title">Title</label>
-			<input class="field-input editor-title-input" id="page_title" type="text" name="post_title" placeholder="About, Contact, Colophon..." autofocus>
+			<input class="field-input editor-title-input" id="page_title" type="text" name="post_title" placeholder="About, Contact, Colophon..." autocomplete="off" autofocus>
 		</div>
 		<div class="field editor-body-field">
 			<span class="field-label">Body <span class="editor-hint">Markdown &middot; preview on the right</span></span>
-			<textarea class="field-input field-textarea" name="post_body" data-markdown placeholder="Write your page in Markdown..."></textarea>
+			<textarea class="field-input field-textarea" name="post_body" data-markdown placeholder="Write your page in Markdown..." autocomplete="off"></textarea>
 		</div>
 		<footer class="editor-actions">
 			<span class="editor-note">Preview toggles from the toolbar &middot; Ctrl/&#8984; + S saves.</span>

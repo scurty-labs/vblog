@@ -1,15 +1,35 @@
-/* Default: light page, dark surfaces, green accent. */
+@import url("/themes/_glass.css");
+
+/* Default: light frost. Flush-left rail, single content column. */
 :root {
-	--page-bg: #dddddd;
-	--surface: #1f1f1f;
-	--surface-text: #999999;
-	--heading: #ffffff;
-	--text: #000000;
-	--muted: #aaaaaa;
-	--link-muted: #888888;
-	--code-bg: #d2d2d2;
-	--code-text: #333333;
-	--input-bg: #222222;
-	--input-text: #ffffff;
-	--input-focus-bg: #666666;
+	--page-bg: #eef1f7;
+	--glow-a: rgba(96, 165, 250, 0.4);
+	--glow-b: rgba(244, 114, 182, 0.2);
+	--glow-c: rgba(52, 211, 153, 0.22);
+	--panel: rgba(255, 255, 255, 0.5);
+	--panel-strong: rgba(255, 255, 255, 0.74);
+	--panel-border: rgba(15, 23, 42, 0.12);
+	--hairline: rgba(15, 23, 42, 0.22);
+	--shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+	--text: #1b2436;
+	--heading: #0a1020;
+	--muted: #5b6a85;
+	--surface-text: #33405c;
+	--link: #1747a8;
+	--code-bg: rgba(226, 232, 242, 0.85);
+	--code-text: #1b2436;
+	--input-bg: rgba(255, 255, 255, 0.62);
+	--input-text: #101828;
+	--input-focus-bg: rgba(255, 255, 255, 0.95);
+	--noise: 0.12;
+	--radius: 8px;
+	--on-accent: #ffffff;
+}
+
+.theme-default .post_content a {
+	text-decoration-color: rgba(23, 71, 168, 0.4);
+}
+
+.theme-default .post-card:hover {
+	border-color: rgba(15, 23, 42, 0.24);
 }

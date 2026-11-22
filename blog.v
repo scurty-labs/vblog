@@ -3,14 +3,15 @@ module main
 import veb
 import db.sqlite
 import markdown // v install markdown
-
-const port = 8082
+import time
 
 pub struct Context {
 	veb.Context
 pub mut:
 	settings         Settings
+	tz               &time.Location
 	themes           []string
+	timezones        []string
 	search_query     string
 	posts_count      int
 	page_count       int
@@ -23,6 +24,13 @@ pub mut:
 	admin_filter     string
 	page_title       string
 	page_description string
+	page_links       []int
+	invalid_accent   bool
+	toast_message    string
+	toast_tone       string
+	toast_icon       string
+	scheduled_watch  []Post
+	server_now       i64
 	og_type          string
 	editor           bool
 	is_admin         bool
@@ -40,6 +48,18 @@ pub mut:
 	media_skipped    string
 	media_error      string
 	media_page       bool
+	backups          []BackupEntry
+	backup_schedule  BackupSchedule
+	backup_intervals []int
+	backup_count     int
+	backup_bytes     i64
+	backup_last      i64
+	backup_next      i64
+	backup_created   string
+	backup_restored  string
+	backup_saved     string
+	backup_error     string
+	backup_page      bool
 }
 
 pub struct App {
@@ -53,11 +73,19 @@ pub mut:
 fn main() {
 	mut app := &App{}
 
+	if run_command_line_options() {
+		return
+	}
+
 	app.config = load_config()
+	mut import_samples := false
 	if app.config.client_secret.len == 0 { // My C days are catching up...
-		println('Cannot find configuration file. Entering setup...')
-		generate_config()
-		exit(1)
+		import_samples = generate_config() or { exit(1) }
+		app.config = load_config()
+		if app.config.client_secret.len == 0 {
+			println('Setup did not finish; run ./vblog again to retry.')
+			exit(1)
+		}
 	}
 
 	app.db = sqlite.connect('primary.sqlite') or {
@@ -67,12 +95,24 @@ fn main() {
 
 	app.ensure_settings_schema()
 	app.ensure_post_schema()
-	app.ensure_demo_post()
 	app.ensure_media_schema()
+	// Both the style-guide post and the rest of the sample content are part of
+	// the same offer. Declining it leaves a genuinely empty blog; nothing is
+	// written behind the author's back.
+	if import_samples {
+		app.ensure_demo_post()
+		app.import_sample_data()
+	}
 	app.sync_media_library()
 
+	// Automatic backups run on their own connection, so they keep working while
+	// requests are being served.
+	spawn run_backup_scheduler()
+
 	app.handle_static('static', true) or { panic(err) }
-	app.mount_static_folder_at(media_dir, '/media') or { panic(err) }
+	// Media is served by serve_media_file rather than a mounted folder: one
+	// route means every upload, old or new, gets the same MIME type and the
+	// same security headers.
 
 	app.serve_static('/pure-min.css', 'static/css/pure-min.css') or { panic(err) }
 	app.serve_static('/pure-grids-responsive-min.css', 'static/css/pure-grids-responsive-min.css') or {
@@ -81,20 +121,31 @@ fn main() {
 	app.serve_static('/style.css', 'static/css/style.css') or { panic(err) }
 	app.serve_static('/admin.css', 'static/css/admin.css') or { panic(err) }
 
-	veb.run[App, Context](mut app, port)
+	veb.run[App, Context](mut app, app.config.port)
 }
 
 // prepare loads the current blog settings and admin state for one request.
 pub fn (mut app App) prepare(mut ctx Context) {
 	ctx.settings = app.load_settings()
+	// Resolve the blog's zone once per request; every date shown or schedule
+	// parsed in this response goes through it.
+	ctx.tz = zone_location(ctx.settings.timezone)
 	ctx.is_admin = app.auth(ctx)
 	ctx.pages = app.get_pages()
 	ctx.tags = app.get_tag_counts()
 	ctx.editor = false
 	ctx.media_page = false
+	ctx.backup_page = false
 	ctx.page_title = ctx.settings.blog_title
 	ctx.page_description = plain_text(ctx.settings.blog_description, 160)
 	ctx.og_type = 'website'
+	// Response hardening for every page. None of it changes how the blog
+	// renders: browsers must trust the declared type, may not frame the blog
+	// inside another site, and other origins only learn where a visit came from.
+	ctx.set_custom_header('X-Content-Type-Options', 'nosniff') or {}
+	ctx.set_custom_header('X-Frame-Options', 'DENY') or {}
+	ctx.set_custom_header('Referrer-Policy', 'strict-origin-when-cross-origin') or {}
+	ctx.set_toast_from_query()
 }
 
 pub fn (mut app App) index(mut ctx Context) veb.Result {
@@ -103,8 +154,20 @@ pub fn (mut app App) index(mut ctx Context) veb.Result {
 	per_page := ctx.settings.posts_per_page
 	blog_posts := app.get_posts_page(1, per_page)
 	total_pages := app.get_pages_count(per_page)
+	ctx.page_links = page_links(1, total_pages)
 
 	return $veb.html()
+}
+
+// Browsers, feed readers and some tools still ask for /favicon.ico even when
+// the page links its icon, so answer with the uploaded one instead of a 404.
+@['/favicon.ico']
+pub fn (mut app App) favicon_ico(mut ctx Context) veb.Result {
+	settings := app.load_settings()
+	if settings.favicon_url.len > 0 {
+		return ctx.redirect(settings.favicon_url)
+	}
+	return ctx.not_found()
 }
 
 pub fn (ctx &Context) as_html(str string) veb.RawHtml {
@@ -156,6 +219,7 @@ pub fn (mut app App) page(mut ctx Context, page_num int) veb.Result {
 	total_pages := app.get_pages_count(per_page)
 	mut blog_posts := []Post{}
 	mut invalid := false
+	ctx.page_links = page_links(page_num, total_pages)
 	ctx.page_title = 'Page ${page_num} — ${ctx.settings.blog_title}'
 	if page_num >= 1 && page_num <= total_pages {
 		blog_posts = app.get_posts_page(page_num, per_page)

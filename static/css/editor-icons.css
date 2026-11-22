@@ -1,0 +1,72 @@
+/* Toolbar icons.
+   The editor needs eleven Font Awesome glyphs, so this sheet and the subset
+   font carry only those instead of the full stylesheet and font files.
+   Subsetting is a modification under the SIL OFL, so the subset is named
+   "Vblog Toolbar" rather than Font Awesome's reserved name; its licence sits
+   beside the font in /vendor/fontawesome/LICENSE.txt. */
+
+@font-face {
+	font-family: "Vblog Toolbar";
+	font-style: normal;
+	font-weight: 900;
+	font-display: swap;
+	src: url("/vendor/fontawesome/webfonts/toolbar-icons.woff2") format("woff2");
+}
+
+.fa,
+.fas {
+	display: inline-block;
+	font-family: "Vblog Toolbar";
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 900;
+	line-height: 1;
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.fa-bold::before {
+	content: "\f032";
+}
+
+.fa-italic::before {
+	content: "\f033";
+}
+
+.fa-header::before,
+.fa-heading::before {
+	content: "\f1dc";
+}
+
+.fa-quote-left::before {
+	content: "\f10d";
+}
+
+.fa-list-ul::before {
+	content: "\f0ca";
+}
+
+.fa-list-ol::before {
+	content: "\f0cb";
+}
+
+.fa-link::before {
+	content: "\f0c1";
+}
+
+.fa-image::before {
+	content: "\f03e";
+}
+
+.fa-code::before {
+	content: "\f121";
+}
+
+.fa-table::before {
+	content: "\f0ce";
+}
+
+.fa-columns::before {
+	content: "\f0db";
+}

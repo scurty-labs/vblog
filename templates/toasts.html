@@ -1,0 +1,12 @@
+<!-- Save confirmations. The server renders the toast here when a save
+     redirects with ?saved=, and site.js reveals it, dismisses it after a few
+     seconds and clears the flag from the address bar. -->
+<div class="toast-stack" id="toast-stack" aria-live="polite" aria-atomic="false">
+@if ctx.toast_message.len > 0
+	<div class="toast toast-@ctx.toast_tone" data-toast>
+		<svg class="icon" aria-hidden="true"><use href="#@ctx.toast_icon"></use></svg>
+		<p class="toast-text">@ctx.toast_message</p>
+		<button class="toast-close" type="button" aria-label="Dismiss"><svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg></button>
+	</div>
+@end
+</div>

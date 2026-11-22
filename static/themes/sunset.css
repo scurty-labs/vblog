@@ -1,0 +1,41 @@
+@import url("/themes/_glass.css");
+
+/* Sunset: warm peach frost, flush-left rail, coral gradients. */
+:root {
+	--page-bg: #fff3e9;
+	--glow-a: rgba(251, 146, 60, 0.38);
+	--glow-b: rgba(244, 63, 94, 0.24);
+	--glow-c: rgba(168, 85, 247, 0.14);
+	--panel: rgba(255, 250, 244, 0.56);
+	--panel-strong: rgba(255, 252, 248, 0.8);
+	--panel-border: rgba(124, 45, 18, 0.16);
+	--hairline: rgba(124, 45, 18, 0.3);
+	--shadow: 0 20px 44px rgba(124, 45, 18, 0.16);
+	--text: #442417;
+	--heading: #2a1208;
+	--muted: #8a5a44;
+	--surface-text: #62392a;
+	--link: #b23c12;
+	--code-bg: rgba(248, 227, 211, 0.92);
+	--code-text: #442417;
+	--input-bg: rgba(255, 251, 246, 0.7);
+	--input-text: #2a1208;
+	--input-focus-bg: #fffdf9;
+	--noise: 0.13;
+	--radius: 10px;
+}
+
+.theme-sunset .site-title {
+	font-size: clamp(1.5rem, 2.6vw, 1.9rem);
+}
+
+.theme-sunset .site-title a {
+	background: linear-gradient(100deg, #c2410c, #e11d48 60%, #7c3aed);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+
+.theme-sunset .view_post_header::before {
+	background: radial-gradient(closest-side, rgba(251, 146, 60, 0.45), transparent);
+}

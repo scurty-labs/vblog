@@ -1,0 +1,36 @@
+<article class="post-card blog_post reveal" data-post-id="@post.id">
+
+	<header class="post-header post_header">
+
+	<h2 class="post-title post_title"> <a href="/view/post/@post.id"> @post.title </a> </h2>
+	@if ctx.settings.show_post_meta != 0
+	<div class="post-meta post_meta">
+		<time datetime="@ctx.post_date(post)">@ctx.post_date(post)</time>
+		<span class="post-reading"><svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg>@post.reading_time() min read</span>
+	</div>
+	@end
+	@if post.tag_list().len > 0
+	<div class="post-tags">
+@for post_tag in post.tag_list()
+		<a class="tag-chip" href="/tag/@post_tag">@post_tag</a>
+@end
+	</div>
+	@end
+
+	</header>
+
+	<div class="post-content post_content">@{ ctx.as_html(post.body) }</div>
+
+	<footer class="post-footer post_footer">
+	@if ctx.is_admin
+	<span class="post-actions post_actions">
+		<a class="action-danger" href="/delete/post/@post.id" onclick="return confirm('Delete this post?')"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg>Delete</a>
+		<a href="/edit/post/@post.id"><svg class="icon" aria-hidden="true"><use href="#i-edit"></use></svg>Edit</a>
+		@if post.is_page == 0
+		<a href="/promote/post/@post.id"><svg class="icon" aria-hidden="true"><use href="#i-file"></use></svg>Promote to page</a>
+		@end
+	</span>
+	@end
+	</footer>
+
+</article>

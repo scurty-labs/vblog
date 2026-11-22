@@ -12,50 +12,244 @@
 		</div>
 		<div class="dash-actions">
 			<a class="pure-button" href="/admin"><svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>Dashboard</a>
+			<a class="pure-button" href="/" target="_blank" rel="noopener"><svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg>View blog</a>
 		</div>
 	</header>
+
+	<nav class="settings-index" aria-label="Settings sections">
+		<a href="#identity">Identity</a>
+		<a href="#branding">Branding</a>
+		<a href="#content">Content</a>
+		<a href="#appearance">Appearance</a>
+		<a href="#visibility">Visibility</a>
+	</nav>
 
 	@if ctx.invalid_settings
 	<p class="form-error">Couldn't save settings. Please try again.</p>
 	@end
 
-	<form class="dash-panel pure-form form-stack" method="post" action="/save/settings">
-		<label class="field">
-			<span class="field-label">Blog Title</span>
-			<input class="field-input" type="text" name="blog_title" value="@ctx.settings.blog_title">
-		</label>
-		<label class="field">
-			<span class="field-label">Blog Description</span>
-			<textarea class="field-input field-textarea" name="blog_description">@ctx.settings.blog_description</textarea>
-		</label>
-		<label class="field">
-			<span class="field-label">Footer Text <span class="editor-hint">Markdown links allowed</span></span>
-			<textarea class="field-input field-textarea footer-input" name="footer_text" rows="3">@ctx.settings.footer_text</textarea>
-		</label>
-		<div class="field-row">
-			<label class="field">
-				<span class="field-label">Posts Per Page</span>
-				<input class="field-input" type="number" name="posts_per_page" min="1" max="100" value="@ctx.settings.posts_per_page">
-			</label>
-			<label class="field">
-				<span class="field-label">Accent Color</span>
-				<input class="field-input" type="text" name="accent_foreground" value="@ctx.settings.accent_foreground">
-			</label>
-		</div>
-		<label class="field">
-			<span class="field-label">Theme</span>
-			<select class="field-input field-select" name="theme">
-@for theme in ctx.themes
-	@if theme == ctx.settings.theme
-				<option value="@theme" selected>@ctx.theme_label(theme)</option>
+	<form class="settings-form pure-form" method="post" action="/save/settings">
+
+		<section class="settings-group dash-panel" id="identity">
+			<div class="settings-group-head">
+				<h2 class="settings-group-title"><svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg>Identity</h2>
+				<p class="settings-group-hint">The name and intro readers see at the top of the blog.</p>
+			</div>
+			<div class="settings-group-body">
+				<label class="field">
+					<span class="field-label">Blog Title</span>
+					<input class="field-input" type="text" name="blog_title" value="@ctx.settings.blog_title" autocomplete="off">
+					<span class="field-hint">Shown in the sidebar, the browser tab and the feed title.</span>
+				</label>
+				<label class="field">
+					<span class="field-label">Blog Description</span>
+					<textarea class="field-input field-textarea settings-textarea" name="blog_description" autocomplete="off">@ctx.settings.blog_description</textarea>
+					<span class="field-hint">A sentence or two of introduction, also used for search results.</span>
+				</label>
+			</div>
+		</section>
+
+		<section class="settings-group dash-panel" id="branding">
+			<div class="settings-group-head">
+				<h2 class="settings-group-title"><svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg>Branding</h2>
+				<p class="settings-group-hint">The logo in the sidebar and the icon browsers show for the site.</p>
+			</div>
+			<div class="settings-group-body">
+
+				<div class="settings-asset">
+					<h3 class="settings-subtitle">Logo</h3>
+					<p class="settings-subhint">Optional, shown under the blog title in the sidebar. Paste a link, or upload a file to replace it.</p>
+					@if ctx.upload_status('logo') == 'empty'
+					<p class="form-error">Choose an image to upload.</p>
+					@else if ctx.upload_status('logo') == 'error'
+					<p class="form-error">Couldn't use that file. Upload a PNG, SVG, GIF, JPEG or WebP under 2&nbsp;MB.</p>
+					@else if ctx.upload_status('logo') == 'saved'
+					<p class="settings-note"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Logo updated.</p>
+					@else if ctx.upload_status('logo') == 'removed'
+					<p class="settings-note"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Logo removed.</p>
+					@end
+
+					<label class="field">
+						<span class="field-label">Logo Link</span>
+						<input class="field-input" type="text" name="logo_url" value="@ctx.settings.logo_url" placeholder="/media/logo.png" autocomplete="off">
+					</label>
+
+					@if ctx.settings.logo_url != ''
+					<div class="upload-current">
+						<img class="upload-preview upload-preview-wide" src="@ctx.settings.logo_url" alt="Current logo">
+						<span class="upload-path">@ctx.settings.logo_url</span>
+						<a class="action-danger" href="/remove/logo" onclick="return confirm('Remove the logo?')">Remove</a>
+					</div>
+					@end
+
+					<div class="settings-upload-field">
+						<span class="field-label">Or Upload a Logo</span>
+						<div class="settings-upload">
+							<input class="field-input settings-file" type="file" name="logo_file" form="logo-upload" accept=".png,.svg,.gif,.jpg,.jpeg,.webp" aria-label="Logo file">
+							<button class="button-success pure-button" type="submit" form="logo-upload"><svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg>Upload logo</button>
+						</div>
+						<span class="field-hint">PNG, SVG, GIF, JPEG or WebP, up to 2&nbsp;MB. Uploading switches the logo on.</span>
+					</div>
+
+					<label class="switch-field">
+						<input class="switch-input" type="checkbox" name="logo_enabled" value="1" @{ ctx.checked(ctx.settings.logo_enabled) }>
+						<span class="switch-track" aria-hidden="true"></span>
+						<span class="switch-text">Show the logo<small>Takes effect as soon as a logo is set.</small></span>
+					</label>
+				</div>
+
+				<div class="settings-asset">
+					<h3 class="settings-subtitle">Favicon</h3>
+					<p class="settings-subhint">The small icon in browser tabs, bookmarks and history.</p>
+					@if ctx.upload_status('favicon') == 'empty'
+					<p class="form-error">Choose a favicon file to upload.</p>
+					@else if ctx.upload_status('favicon') == 'error'
+					<p class="form-error">Couldn't use that file. Upload an ICO, PNG, SVG, GIF or JPEG up to 512&nbsp;KB.</p>
+					@else if ctx.upload_status('favicon') == 'saved'
+					<p class="settings-note"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Favicon updated.</p>
+					@else if ctx.upload_status('favicon') == 'removed'
+					<p class="settings-note"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Favicon removed.</p>
+					@end
+
+					@if ctx.settings.favicon_url != ''
+					<div class="upload-current">
+						<img class="upload-preview" src="@ctx.settings.favicon_url" alt="Current favicon" width="32" height="32">
+						<span class="upload-path">@ctx.settings.favicon_url</span>
+						<a class="action-danger" href="/remove/favicon" onclick="return confirm('Remove the favicon?')">Remove</a>
+					</div>
+					@end
+
+					<div class="settings-upload-field">
+						<span class="field-label">Favicon File</span>
+						<div class="settings-upload">
+							<input class="field-input settings-file" type="file" name="favicon_file" form="favicon-upload" accept=".ico,.png,.svg,.gif,.jpg,.jpeg,.webp" aria-label="Favicon file">
+							<button class="button-success pure-button" type="submit" form="favicon-upload"><svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg>Upload favicon</button>
+						</div>
+						<span class="field-hint">ICO, PNG, SVG, GIF or JPEG, up to 512&nbsp;KB.</span>
+					</div>
+				</div>
+
+			</div>
+		</section>
+
+		<section class="settings-group dash-panel" id="content">
+			<div class="settings-group-head">
+				<h2 class="settings-group-title"><svg class="icon" aria-hidden="true"><use href="#i-file"></use></svg>Content</h2>
+				<p class="settings-group-hint">How much is published at once and what sits at the foot of every page.</p>
+			</div>
+			<div class="settings-group-body">
+				<label class="field settings-field-narrow">
+					<span class="field-label">Posts Per Page</span>
+					<input class="field-input" type="number" name="posts_per_page" min="1" max="100" value="@ctx.settings.posts_per_page">
+					<span class="field-hint">Anywhere from 1 to 100.</span>
+				</label>
+				<label class="field settings-field-narrow">
+					<span class="field-label">Time Zone</span>
+					<select class="field-input field-select" name="timezone">
+@for zone in ctx.timezones
+	@if zone == ctx.settings.timezone
+						<option value="@zone" selected>@ctx.timezone_label(zone)</option>
 	@else
-				<option value="@theme">@ctx.theme_label(theme)</option>
+						<option value="@zone">@ctx.timezone_label(zone)</option>
 	@end
 @end
-			</select>
-		</label>
-		<button class="button-success pure-button" type="submit"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Save settings</button>
+					</select>
+					<span class="field-hint">Schedules, the editor's publish-at field and the dates readers see all use this zone.</span>
+				</label>
+				<label class="field">
+					<span class="field-label">Footer Text</span>
+					<textarea class="field-input field-textarea footer-input" name="footer_text" rows="3" autocomplete="off">@ctx.settings.footer_text</textarea>
+					<span class="field-hint">Markdown links allowed.</span>
+				</label>
+				<label class="switch-field">
+					<input class="switch-input" type="checkbox" name="show_footer" value="1" @{ ctx.checked(ctx.settings.show_footer) }>
+					<span class="switch-track" aria-hidden="true"></span>
+					<span class="switch-text">Show the footer text<small>Turn off to end pages with the last post instead.</small></span>
+				</label>
+			</div>
+		</section>
+
+		<section class="settings-group dash-panel" id="appearance">
+			<div class="settings-group-head">
+				<h2 class="settings-group-title"><svg class="icon" aria-hidden="true"><use href="#i-sliders"></use></svg>Appearance</h2>
+				<p class="settings-group-hint">The theme and accent colour every page uses.</p>
+			</div>
+			<div class="settings-group-body">
+				<label class="field settings-field-narrow">
+					<span class="field-label">Theme</span>
+					<select class="field-input field-select" name="theme">
+@for theme in ctx.themes
+	@if theme == ctx.settings.theme
+						<option value="@theme" selected>@ctx.theme_label(theme)</option>
+	@else
+						<option value="@theme">@ctx.theme_label(theme)</option>
+	@end
+@end
+					</select>
+					<span class="field-hint">Applies with the rest of the settings when you save.</span>
+				</label>
+				@if ctx.invalid_accent
+				<p class="form-error">The accent colour has to be a CSS colour such as <code>#0b7a3b</code> or <code>rgb(11 122 59)</code>. The saved colour was kept.</p>
+				@end
+				<label class="field settings-field-narrow">
+					<span class="field-label">Accent Color</span>
+					<span class="settings-color">
+						<span class="swatch" style="background: ${ctx.settings.accent_foreground};" aria-hidden="true"></span>
+						<input class="field-input" type="text" name="accent_foreground" value="@ctx.settings.accent_foreground" autocomplete="off">
+					</span>
+					<span class="field-hint">A CSS colour such as <code>#0b7a3b</code> or <code>rgb(11 122 59)</code>.</span>
+				</label>
+			</div>
+		</section>
+
+		<section class="settings-group dash-panel" id="visibility">
+			<div class="settings-group-head">
+				<h2 class="settings-group-title"><svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg>Visibility</h2>
+				<p class="settings-group-hint">Switches for the sidebar and the details around each post.</p>
+			</div>
+			<div class="settings-group-body">
+				<div class="settings-switches">
+					<label class="switch-field">
+						<input class="switch-input" type="checkbox" name="show_description" value="1" @{ ctx.checked(ctx.settings.show_description) }>
+						<span class="switch-track" aria-hidden="true"></span>
+						<span class="switch-text">Blog description<small>The intro line under the title in the sidebar.</small></span>
+					</label>
+					<label class="switch-field">
+						<input class="switch-input" type="checkbox" name="show_pages" value="1" @{ ctx.checked(ctx.settings.show_pages) }>
+						<span class="switch-track" aria-hidden="true"></span>
+						<span class="switch-text">Pages menu<small>Lists your standalone pages in the sidebar.</small></span>
+					</label>
+					<label class="switch-field">
+						<input class="switch-input" type="checkbox" name="show_tags" value="1" @{ ctx.checked(ctx.settings.show_tags) }>
+						<span class="switch-track" aria-hidden="true"></span>
+						<span class="switch-text">Tag cloud<small>Tag chips with their post counts.</small></span>
+					</label>
+					<label class="switch-field">
+						<input class="switch-input" type="checkbox" name="show_rss" value="1" @{ ctx.checked(ctx.settings.show_rss) }>
+						<span class="switch-track" aria-hidden="true"></span>
+						<span class="switch-text">RSS link<small>The feed link in the sidebar. The feed itself keeps working.</small></span>
+					</label>
+					<label class="switch-field">
+						<input class="switch-input" type="checkbox" name="show_post_meta" value="1" @{ ctx.checked(ctx.settings.show_post_meta) }>
+						<span class="switch-track" aria-hidden="true"></span>
+						<span class="switch-text">Dates and reading time<small>The line under each post title on the index.</small></span>
+					</label>
+				</div>
+			</div>
+		</section>
+
+		<div class="settings-save">
+			<p class="settings-save-note"><span class="settings-dirty" hidden>Unsaved changes · </span>Save to publish your changes.</p>
+			<button class="button-success pure-button" type="submit"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Save settings</button>
+		</div>
 	</form>
+
+	<!-- Upload forms. A form cannot sit inside the settings form above, so these
+	     sit beside it and the file inputs and buttons in the Branding group point
+	     at them with the HTML `form` attribute. Each upload posts on its own,
+	     which leaves the text settings on the Save button. -->
+	<form id="logo-upload" method="post" action="/upload/logo" enctype="multipart/form-data"></form>
+	<form id="favicon-upload" method="post" action="/upload/favicon" enctype="multipart/form-data"></form>
 
 </main>
 </div>

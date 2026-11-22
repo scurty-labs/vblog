@@ -17,6 +17,16 @@
 		</div>
 	</header>
 
+	@if ctx.scheduled_watch.len > 0
+	<!-- Posts waiting for their publishing time. site.js announces each one as
+	     it goes live, without waiting for the page to be reloaded. -->
+	<ul class="toast-watch" hidden data-server-now="@ctx.server_now">
+	@for post in ctx.scheduled_watch
+		<li data-publish-at="@post.publish_at" data-title="@post.title" data-href="/view/post/@post.id"></li>
+	@end
+	</ul>
+	@end
+
 	<section class="stat-grid" aria-label="Blog statistics">
 		<article class="stat-card">
 			<span class="stat-label">Published</span>
@@ -61,7 +71,7 @@
 			</nav>
 
 			@if ctx.recent_posts.len > 0
-			<table class="dash-table">
+			<table class="dash-table posts-table">
 				<thead>
 					<tr>
 						<th scope="col">Title</th>
@@ -80,17 +90,24 @@
 							@end
 						</td>
 						<td><span class="status-pill status-${post.status_class()}">@post.status_label()</span></td>
-						<td class="dash-date">@post.format_date()</td>
+						<td class="dash-date">@ctx.post_date(post)</td>
 						<td class="dash-row-actions">
-							<a href="/view/post/@post.id" title="View post" aria-label="View post"><svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg></a>
-							<a href="/edit/post/@post.id" title="Edit post" aria-label="Edit post"><svg class="icon" aria-hidden="true"><use href="#i-edit"></use></svg></a>
-							@if post.is_draft() || post.is_scheduled()
-							<a href="/publish/post/@post.id" title="Publish now" aria-label="Publish now"><svg class="icon" aria-hidden="true"><use href="#i-send"></use></svg></a>
-							@else
-							<a href="/unpublish/post/@post.id" title="Move to drafts" aria-label="Move to drafts"><svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg></a>
-							@end
-							<a href="/duplicate/post/@post.id" title="Duplicate post" aria-label="Duplicate post"><svg class="icon" aria-hidden="true"><use href="#i-copy"></use></svg></a>
-							<a class="action-danger" href="/delete/post/@post.id" title="Delete post" aria-label="Delete post" onclick="return confirm('Delete this post?')"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
+						<div class="row-actions">
+							<div class="row-menu">
+								<button class="row-menu-toggle" type="button" aria-expanded="false" aria-label="Actions for @post.title"><svg class="icon" aria-hidden="true"><use href="#i-more"></use></svg></button>
+								<div class="row-menu-list">
+									<a href="/view/post/@post.id" title="View post" aria-label="View post"><svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg><span class="row-menu-text">View</span></a>
+									<a href="/edit/post/@post.id" title="Edit post" aria-label="Edit post"><svg class="icon" aria-hidden="true"><use href="#i-edit"></use></svg><span class="row-menu-text">Edit</span></a>
+									@if post.is_draft() || post.is_scheduled()
+									<a href="/publish/post/@post.id" title="Publish now" aria-label="Publish now"><svg class="icon" aria-hidden="true"><use href="#i-send"></use></svg><span class="row-menu-text">Publish now</span></a>
+									@else
+									<a href="/unpublish/post/@post.id" title="Move to drafts" aria-label="Move to drafts"><svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg><span class="row-menu-text">Move to drafts</span></a>
+									@end
+									<a href="/duplicate/post/@post.id" title="Duplicate post" aria-label="Duplicate post"><svg class="icon" aria-hidden="true"><use href="#i-copy"></use></svg><span class="row-menu-text">Duplicate</span></a>
+									<a class="action-danger" href="/delete/post/@post.id" title="Delete post" aria-label="Delete post" onclick="return confirm('Delete this post?')"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg><span class="row-menu-text">Delete</span></a>
+								</div>
+							</div>
+						</div>
 						</td>
 					</tr>
 @end
@@ -129,7 +146,7 @@
 			<a class="dash-link" href="/newpage"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg> New page</a>
 		</header>
 		@if ctx.pages.len > 0
-		<table class="dash-table">
+		<table class="dash-table pages-table">
 			<thead>
 				<tr>
 					<th scope="col">Title</th>
@@ -141,9 +158,11 @@
 				<tr>
 					<td><a class="post-link" href="/pages/@site_page.id">@site_page.title</a></td>
 					<td class="dash-row-actions">
-						<a href="/pages/@site_page.id" title="View page" aria-label="View page"><svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg></a>
-						<a href="/edit/page/@site_page.id" title="Edit page" aria-label="Edit page"><svg class="icon" aria-hidden="true"><use href="#i-edit"></use></svg></a>
-						<a class="action-danger" href="/delete/page/@site_page.id" title="Delete page" aria-label="Delete page" onclick="return confirm('Delete this page?')"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
+						<div class="row-actions">
+							<a href="/pages/@site_page.id" title="View page" aria-label="View page"><svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg></a>
+							<a href="/edit/page/@site_page.id" title="Edit page" aria-label="Edit page"><svg class="icon" aria-hidden="true"><use href="#i-edit"></use></svg></a>
+							<a class="action-danger" href="/delete/page/@site_page.id" title="Delete page" aria-label="Delete page" onclick="return confirm('Delete this page?')"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
+						</div>
 					</td>
 				</tr>
 @end

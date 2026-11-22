@@ -1,0 +1,38 @@
+@import url("/themes/_glass.css");
+
+/* Forest: deep evergreen glass, flush-left rail, single content column. */
+:root {
+	--page-bg: #07130f;
+	--glow-a: rgba(16, 185, 129, 0.26);
+	--glow-b: rgba(132, 204, 22, 0.16);
+	--glow-c: rgba(20, 83, 45, 0.42);
+	--panel: rgba(255, 255, 255, 0.045);
+	--panel-strong: rgba(255, 255, 255, 0.08);
+	--panel-border: rgba(167, 243, 208, 0.16);
+	--hairline: rgba(167, 243, 208, 0.32);
+	--shadow: 0 20px 46px rgba(0, 0, 0, 0.45);
+	--text: #d3e8dd;
+	--heading: #f1fff8;
+	--muted: #8aa89a;
+	--surface-text: #a9c9b9;
+	--link: #8be0b4;
+	--code-bg: rgba(13, 31, 24, 0.88);
+	--code-text: #d9f2e5;
+	--input-bg: rgba(255, 255, 255, 0.05);
+	--input-text: #effff7;
+	--input-focus-bg: rgba(255, 255, 255, 0.1);
+	--noise: 0.24;
+	--radius: 10px;
+}
+
+.theme-forest .site-sidebar .site-title {
+	font-size: 1.35rem;
+}
+
+.theme-forest .post-card {
+	padding: 1.5rem 1.6rem;
+}
+
+.theme-forest .view_post_header .post_title {
+	color: #eafff4;
+}

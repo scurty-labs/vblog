@@ -3,10 +3,15 @@ module main
 import veb
 import time
 
-// ensure_post_schema upgrades databases created before tags, drafts and
-// scheduled publishing existed. A brand new database has no Post table yet;
-// the ORM creates it from the struct on first insert, so there is nothing to do.
+// ensure_post_schema creates the post table on a fresh install and upgrades
+// databases created before tags, drafts and scheduled publishing existed. The
+// ORM reads and writes an existing table but does not create one, so a brand
+// new database needs the CREATE TABLE below before any insert can succeed.
 fn (mut app App) ensure_post_schema() {
+	app.db.execute("CREATE TABLE IF NOT EXISTS Post (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL DEFAULT '', body TEXT NOT NULL DEFAULT '', tags TEXT NOT NULL DEFAULT '', status TEXT NOT NULL DEFAULT 'published', publish_at INTEGER NOT NULL DEFAULT 0, deleted INTEGER NOT NULL DEFAULT 0, date INTEGER NOT NULL DEFAULT 0, is_page INTEGER NOT NULL DEFAULT 0)") or {
+		panic(err)
+	}
+
 	columns := app.db.execute('PRAGMA table_info(Post)') or { return }
 	if columns.len == 0 {
 		return
@@ -58,7 +63,7 @@ fn (mut app App) ensure_demo_post() {
 	if count == 0 {
 		post_id := app.insert_post(Post{
 			title:  demo_post_title
-			body:   $embed_file('demo_post.md').to_string()
+			body:   $embed_file('sample-data/demo_post.md').to_string()
 			tags:   'style, markdown, demo'
 			status: 'published'
 			date:   time.now().unix()
@@ -103,14 +108,6 @@ pub fn (mut app App) get_scheduled_count() int {
 		select count from Post where deleted == 0 && is_page == 0 && status == 'published' && publish_at > now
 	} or { 0 }
 	return num
-}
-
-// format_date renders the publish date in a compact, human form.
-pub fn (post Post) format_date() string {
-	t := time.unix(post.published_time())
-	months := ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-	month := if t.month >= 1 && t.month <= 12 { months[t.month - 1] } else { '' }
-	return '${month} ${t.day}, ${t.year}'
 }
 
 // published_time is the date the post appeared (or will appear) publicly.
@@ -168,31 +165,11 @@ pub fn (post Post) status_class() string {
 	return 'published'
 }
 
-// publish_at_input renders the stored schedule for a datetime-local input.
-pub fn (post Post) publish_at_input() string {
-	if post.publish_at <= 0 {
-		return ''
-	}
-	t := time.unix(post.publish_at)
-	return '${t.year}-${two_digits(t.month)}-${two_digits(t.day)}T${two_digits(t.hour)}:${two_digits(t.minute)}'
-}
-
 fn two_digits(n int) string {
 	if n < 10 {
 		return '0${n}'
 	}
 	return '${n}'
-}
-
-// parse_publish_at converts a datetime-local value into a Unix timestamp.
-// An empty or malformed value means "no schedule".
-pub fn parse_publish_at(value string) i64 {
-	clean := value.trim_space().replace('T', ' ')
-	if clean.len < 16 {
-		return 0
-	}
-	t := time.parse(clean + ':00') or { return 0 }
-	return t.unix()
 }
 
 pub fn (mut app App) get_post_by_id(post_id int) ?Post {
@@ -242,6 +219,20 @@ pub fn (mut app App) get_recent_published_posts(limit int) []Post {
 	now := time.now().unix()
 	posts := sql app.db {
 		select from Post where deleted == 0 && is_page == 0 && status == 'published' && publish_at <= now order by date desc limit limit
+	} or { []Post{} }
+	return posts
+}
+
+// get_scheduled_posts lists the posts still waiting for their time, soonest
+// first. The dashboard watches them so each one can be announced as it goes
+// live, since publishing is a time window rather than a background job.
+pub fn (mut app App) get_scheduled_posts(limit int) []Post {
+	if limit <= 0 {
+		return []Post{}
+	}
+	now := time.now().unix()
+	posts := sql app.db {
+		select from Post where deleted == 0 && is_page == 0 && status == 'published' && publish_at > now order by publish_at asc limit limit
 	} or { []Post{} }
 	return posts
 }

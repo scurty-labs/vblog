@@ -1,0 +1,33 @@
+@include 'header'
+
+@include 'admin_bar'
+
+<div class="site-shell">
+
+@include 'sidebar'
+
+<main class="site-main content">
+
+<section id="posts" class="post-list">
+
+<header class="search-summary tag-summary">
+	<p class="page-kicker">Tag</p>
+	<h1 class="tag-heading">#@tag_name</h1>
+	<p class="search-heading">@tag_posts.len post(s) with this tag.</p>
+</header>
+
+@if tag_posts.len > 0
+@for post in tag_posts
+@include 'post_card'
+@end
+@else
+<p class="page-indicator">No published posts carry this tag yet.</p>
+@end
+
+</section>
+
+</main>
+
+</div>
+
+@include 'footer'

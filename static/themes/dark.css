@@ -1,15 +1,34 @@
-/* Dark: near-black page with cool grey text. */
+@import url("/themes/_glass.css");
+
+/* Dark: charcoal glass, flush-left rail, compact type. */
 :root {
-	--page-bg: #14171a;
-	--surface: #0b0d0f;
-	--surface-text: #8b949e;
-	--heading: #f0f6fc;
-	--text: #c9d1d9;
-	--muted: #8b949e;
-	--link-muted: #8b949e;
-	--code-bg: #1f2428;
-	--code-text: #c9d1d9;
-	--input-bg: #1f2428;
-	--input-text: #f0f6fc;
-	--input-focus-bg: #30363d;
+	--page-bg: #0b0e13;
+	--glow-a: rgba(56, 189, 248, 0.2);
+	--glow-b: rgba(99, 102, 241, 0.22);
+	--glow-c: rgba(16, 185, 129, 0.12);
+	--panel: rgba(255, 255, 255, 0.045);
+	--panel-strong: rgba(255, 255, 255, 0.075);
+	--panel-border: rgba(255, 255, 255, 0.1);
+	--hairline: rgba(255, 255, 255, 0.2);
+	--shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+	--text: #c8d2e0;
+	--heading: #f4f8ff;
+	--muted: #8593a8;
+	--surface-text: #9fb0c8;
+	--link: #8fc4ff;
+	--code-bg: rgba(18, 22, 29, 0.9);
+	--code-text: #d6e0ee;
+	--input-bg: rgba(18, 22, 29, 0.85);
+	--input-text: #eef4ff;
+	--input-focus-bg: rgba(27, 34, 48, 0.95);
+	--noise: 0.24;
+	--radius: 8px;
+}
+
+.theme-dark .site-sidebar .site-title {
+	font-size: 1.3rem;
+}
+
+.theme-dark .post-card {
+	padding: 1.6rem 1.7rem;
 }
