@@ -116,7 +116,7 @@ v install markdown
 ### 1. Get the code and build
 
 ```sh
-git clone <repository-url> vblog
+git clone [vblog](https://github.com/scurty-labs/vblog) vblog
 cd vblog
 v -prod .
 ```
